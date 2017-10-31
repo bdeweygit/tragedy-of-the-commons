@@ -1,0 +1,54 @@
+.App {
+  text-align: center;
+  overflow: auto;
+  min-height: 100%;
+  min-width: 100%;
+  display: inline-block;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 60px;
+}
+
+.App-header {
+  height: 80px;
+  padding: 20px;
+  color: black;
+}
+
+.App-title {
+  font-size: 1.4em;
+}
+
+.PixelCanvas-container {
+  display: flex;
+  justify-content: center;
+}
+
+.PixelCanvas {
+  background-color: white;
+  margin: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0px 0px 20px 0px #444444;
+}
+
+.Loader {
+  border: 16px solid white;
+  border-top: 16px solid black;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  margin-top: 200px;
+  animation: Loader-spin 2s linear infinite;
+}
+
+@keyframes Loader-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

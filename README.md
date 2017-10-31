@@ -1,79 +1,73 @@
-The content below is an example project proposal / requirements document. Replace the text below the lines marked "__TODO__" with details specific to your project. Remove the "TODO" lines.
-
-(___TODO__: your project name_)
-
-# Shoppy Shoperson 
+# Tragedy Of The Commons
 
 ## Overview
 
-(___TODO__: a brief one or two paragraph, high-level description of your project_)
+Wouldn't it be great if everyone could draw on a shared pixel based canvas? Probably not.
 
-Remembering what to buy at the grocery store is waaaaay too difficult. Also, shopping for groceries when you're hungry leads to regrettable purchases. Sooo... that's where Shoppy Shoperson comes in!
+Tragedy Of The Commons is composed of a web app and a mobile app. On the web side users can view a canvas as it evolves in real-time, as well as create a new canvas that can be either publicly accessible or secured with a private password to share with friends. There is also a default public canvas that anyone can edit. To edit a canvas, that is to change the colors of pixels, you use the mobile app as your controller. The web app is purely for displaying canvases and creating new ones.
 
-Shoppy Shoperson is a web app that will allow users to keep track of multiple grocery lists. Users can register and login. Once they're logged in, they can create or view their grocery list. For every list that they have, they can add items to the list or cross off items.
-
+The web app will be built as a single page React application.
+The mobile app will be built with React Native and served over Expo.
+Web and mobile frontends will communicate with the server over WebSockets by way of the socket.io library.
 
 ## Data Model
 
-(___TODO__: a description of your application's data and their relationships to each other_) 
+Data is modeled by two schemas: Pixel and Canvas.
 
-The application will store Users, Lists and Items
-
-* users can have multiple lists (via references)
-* each list can have multiple items (by embedding)
-
-(___TODO__: sample documents_)
-
-An Example User:
+An Example Pixel:
 
 ```javascript
 {
-  username: "shannonshopper",
-  hash: // a password hash,
-  lists: // an array of references to List documents
+  row: 87,
+  col: 133,
+  color: '#66ff66'
 }
 ```
 
-An Example List with Embedded Items:
+An Example Private Canvas with Embedded Pixels:
 
 ```javascript
 {
-  user: // a reference to a User object
-  name: "Breakfast foods",
-  items: [
-    { name: "pancakes", quantity: "9876", checked: false},
-    { name: "ramen", quantity: "2", checked: true},
-  ],
-  createdAt: // timestamp
+  title: 'AIT Private Canvas',
+  password: // a password hash,
+  rows: 350,
+  cols: 700,
+  pixels: // an array of Pixels
+}
+```
+
+An Example Public Canvas with Embedded Pixels:
+
+```javascript
+{
+  title: 'AIT Public Canvas',
+  password: null,
+  rows: 350,
+  cols: 700,
+  pixels: // an array of Pixels
 }
 ```
 
 
-## [Link to Commented First Draft Schema](db.js) 
-
-(___TODO__: create a first draft of your Schemas in db.js and link to it_)
+## [Link to Commented First Draft Schema](/tragedy-of-the-commons/server/db.js)
 
 ## Wireframes
 
-(___TODO__: wireframes for all of the pages on your site; they can be as simple as photos of drawings or you can use a tool like Balsamiq, Omnigraffle, etc._)
+The web app is a single page application for viewing, creating, and searching for canvases.
 
-/list/create - page for creating a new shopping list
+![web](documentation/web.png)
 
-![list create](documentation/list-create.png)
+![web-create-canvas](documentation/web-create-canvas.png)
 
-/list - page for showing all shopping lists
+![web-find-canvas](documentation/web-find-canvas.png)
 
-![list](documentation/list.png)
+The mobile app is a single screen for editing and searching for canvases.
 
-/list/slug - page for showing specific shopping list
-
-![list](documentation/list-slug.png)
+![mobile](documentation/mobile.png)
 
 ## Site map
 
-(___TODO__: draw out a site map that shows how pages are related to each other_)
-
-Here's a [complex example from wikipedia](https://upload.wikimedia.org/wikipedia/commons/2/20/Sitemap_google.jpg), but you can create one without the screenshots, drop shadows, etc. ... just names of pages and where they flow to.
+Since the web frontend is a single page any path from root will be treated by the server as if it were root. What canvas a user sees is managed by socket.io namespaces rather than routes. Cookies will also ensure that a user can refresh their page and still view the canvas they were viewing rather than being brought back to the default public canvas.
 
 ## User Stories or Use Cases
 
@@ -104,13 +98,11 @@ Here's a [complex example from wikipedia](https://upload.wikimedia.org/wikipedia
 10 points total out of 8 required points (___TODO__: addtional points will __not__ count for extra credit_)
 
 
-## [Link to Initial Main Project File](app.js) 
-
-(___TODO__: create a skeleton Express application with a package.json, app.js, views folder, etc. ... and link to your initial app.js_)
+## [Link to Initial Main Project File](/tragedy-of-the-commons/server/index.js)
 
 ## Annotations / References Used
 
 (___TODO__: list any tutorials/references/etc. that you've based your code off of_)
 
-1. [passport.js authentication docs](http://passportjs.org/docs) - (add link to source code that was based on this)
-2. [tutorial on vue.js](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
+1. [socket.io docs](http://passportjs.org/docs) - (add link to source code that was based on this)
+2. [react.js docs](https://vuejs.org/v2/guide/) - (add link to source code that was based on this)
