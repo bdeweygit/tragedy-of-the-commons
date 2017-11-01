@@ -3,6 +3,9 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
+// TODO use mongoose to interact with MongoDB 
+// mongoose.connect('mongodb://localhost/tragedy-of-the-commons');
+
 const getPixelMatrix = () => { // TODO get it from MongoDB
   const rows = 350;
   const cols = 700;

@@ -7,12 +7,12 @@ Wouldn't it be great if everyone could draw on a shared pixel based canvas? Prob
 Tragedy Of The Commons is composed of a web app and a mobile app. On the web side users can view a canvas as it evolves in real-time, as well as create a new canvas that can be either publicly accessible or secured with a private password to share with friends. There is also a default public canvas that anyone can edit. To edit a canvas, that is to change the colors of pixels, you use the mobile app as your controller. The web app is purely for displaying canvases and creating new ones.
 
 The web app will be built as a single page React application.
-The mobile app will be built with React Native and served over Expo.
-Web and mobile frontends will communicate with the server over WebSockets by way of the socket.io library.
+The mobile app will be built with React Native and deployed over Expo.
+Web and mobile frontends will communicate with the server over WebSockets by way of the Socket.io library.
 
 ## Data Model
 
-Data is modeled by two schemas: Pixel and Canvas.
+Data stored on the server is modeled by two schemas: Pixel and Canvas.
 
 An Example Pixel:
 
@@ -67,7 +67,7 @@ The mobile app is a single screen for editing and searching for canvases.
 
 ## Site map
 
-Since the web frontend is a single page any path from root will be treated by the server as if it were root. What canvas a user sees is managed by socket.io namespaces rather than routes. Cookies will also ensure that a user can refresh their page and still view the canvas they were viewing rather than being brought back to the default public canvas.
+Since the web frontend is a single page any path from root will be treated by the server as if it were root. What canvas a user sees is managed by socket.io namespaces rather than routes. Cookies will also ensure that a user can refresh their page and still view the canvas that they were viewing rather than being brought back to the default public canvas.
 
 ## User Stories or Use Cases
 
@@ -82,9 +82,13 @@ Since the web frontend is a single page any path from root will be treated by th
 ## Research Topics
 
 * (3 points) Socket.io
-    * I will use the server and client Socket.io libraries to handle real-time communication between instances of the app.
+    * I will use the server and client Socket.io libraries to handle real-time communication between instances of the app. This will be used on the web and mobile frontends as well as the server so I give it three points.
 * (5 points) React and React Native
-    * I will use React and React Native as the web and mobile user interface libraries respectively.
+    * I will use React and React Native as the web and mobile user interface libraries respectively. Most of the code for this project will come from these libraries so I give it five points.
+* (0 points) Create React App
+    * I will use Create React App to bootstrap the web application's build configuration with webpack, babel, build optimizations, etcetera. This is essentially no work on my part so I give it zero points.
+* (0 points) Expo
+    * I will use Expo to bootstrap the mobile application's build configuration and to deploy the finished product. This is essentially no work on my part so I give it zero points.
 
 8 points total out of 8 required points
 
@@ -95,3 +99,5 @@ Since the web frontend is a single page any path from root will be treated by th
 1. [Socket.io docs](https://socket.io/docs/)
 2. [React.js docs](https://reactjs.org/docs/hello-world.html)
 3. [React Native docs](https://facebook.github.io/react-native/docs/getting-started.html)
+4. [Create React App docs](https://github.com/facebookincubator/create-react-app)
+5. [Expo docs](https://docs.expo.io/versions/latest/index.html)
