@@ -12,5 +12,8 @@
     "express": "^4.16.2",
     "mongoose": "^4.12.5",
     "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint-config-rallycoding": "^3.2.0"
   }
 }
