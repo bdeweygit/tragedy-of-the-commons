@@ -7,8 +7,8 @@ const pixelSize = 6;
 export default class PixelCanvasScrollView extends React.Component {
   constructor(props) {
     super(props);
-    this.height = props.pixelMatrix.length * pixelSize;
-    this.width = props.pixelMatrix[0].length * pixelSize;
+    this.height = props.canvas.rows * pixelSize;
+    this.width = props.canvas.cols * pixelSize;
   }
 
   componentDidMount() {
@@ -25,7 +25,7 @@ export default class PixelCanvasScrollView extends React.Component {
   }
 
   render() {
-    const { socket, toggleColorSelector } = this.props;
+    const { socket, canvas, toggleColorSelector } = this.props;
     return (
       <ScrollView
         ref='scrollView'
@@ -43,6 +43,7 @@ export default class PixelCanvasScrollView extends React.Component {
         <PixelCanvas
           width={this.width}
           height={this.height}
+          canvas={canvas}
           pixelSize={pixelSize}
           socket={socket}
           toggleColorSelector={toggleColorSelector}

@@ -8,12 +8,12 @@ import ColorSelector from './components/ColorSelector';
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { pixelMatrix: [], colorSelectorVisible: false };
+    this.state = { canvas: {}, colorSelectorVisible: false };
   }
 
   componentDidMount() {
-    this.socket = io('http://localhost:3000');
-    this.socket.on('pixelMatrix', pixelMatrix => this.setState(() => ({ pixelMatrix })));
+    this.socket = io('http://localhost:3000/default');
+    this.socket.on('canvas', canvas => this.setState((prevState) => ({ ...prevState, canvas })));
   }
 
   toggleColorSelector() {
@@ -35,7 +35,7 @@ export default class App extends React.Component {
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
         <PixelCanvasScrollView
-          pixelMatrix={this.state.pixelMatrix}
+          canvas={this.state.canvas}
           socket={this.socket}
           toggleColorSelector={this.toggleColorSelector.bind(this)}
         />
@@ -46,7 +46,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    return this.state.pixelMatrix.length > 0 ?
+    return Object.keys(this.state.canvas).length > 0 ?
       this.renderTragedy() : this.renderLoader();
   }
 }

@@ -5,10 +5,17 @@ import Canvas from 'react-native-canvas';
 export default class PixelCanvas extends React.Component {
 
   componentDidMount() {
+    const { cols, pixels } = this.props.canvas;
     const pixelSize = this.props.pixelSize;
     const ctx = this.refs.canvas.getContext('2d');
-    ctx.fillStyle = 'purple';
-    ctx.fillRect(0, 0, pixelSize, pixelSize);
+    console.log(pixels.length, pixels[0]);
+    pixels.forEach((color, index) => {
+      const row = Math.floor(index / cols);
+      const col = index % cols;
+
+      ctx.fillStyle = color;
+      ctx.fillRect(col, row, pixelSize, pixelSize);
+    });
   }
 
   convertLocationToPosition(location) {
@@ -17,7 +24,7 @@ export default class PixelCanvas extends React.Component {
   }
 
   render() {
-    const { width, height, toggleColorSelector, pixelSize, socket } = this.props;
+    const { width, height, toggleColorSelector, pixelSize, socket, canvas } = this.props;
     return (
       <View
         style={{
@@ -37,8 +44,8 @@ export default class PixelCanvas extends React.Component {
           const { locationX, locationY } = event.nativeEvent;
           const col = this.convertLocationToPosition(locationX);
           const row = this.convertLocationToPosition(locationY);
-          socket.emit('updatePixel', { row, col, color: 'black' });
-          console.log(col, row);
+          const index = col + (row * canvas.cols);
+          socket.emit('updatePixel', { index, color: 'black' });
         }}
       >
         <Canvas

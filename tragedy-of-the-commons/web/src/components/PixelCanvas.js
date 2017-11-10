@@ -6,33 +6,40 @@ export default class PixelCanvas extends React.Component {
   constructor(props) {
     super(props);
 
-    props.socket.on('updatePixel', ({ row, col, color }) => {
-      this.props.pixelMatrix[row][col].color = color;
+    props.socket.on('pixel', ({ color, index }) => {
+      const cols = this.props.cols;
 
+      const row = Math.floor(index / cols);
+      const col = index % cols;
       const ctx = this.refs.canvas.getContext('2d');
       ctx.fillStyle = color;
       ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
     });
 
-    let color = 'red'
-    setInterval(() => {
-      props.socket.emit('updatePixel', { row: 50, col: 50, color });
-      color = color === 'red' ? 'blue' : 'red';
-    }, 500);
+    // let color = 'red'
+    // setInterval(() => {
+    //   props.socket.emit('updatePixel', { color, index: 0 });
+    //   color = color === 'red' ? 'blue' : 'red';
+    // }, 500);
   }
 
   componentDidMount() {
+    const cols = this.props.cols
+
     const ctx = this.refs.canvas.getContext('2d');
-    this.props.pixelMatrix.forEach(row => row.forEach(({ row, col, color}) => {
+    this.props.canvas.pixels.forEach((color, index) => {
+      const row = Math.floor(index / cols);
+      const col = index % cols;
       ctx.fillStyle = color;
       ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
-    }));
+    });
   }
 
   render() {
-    const { className, rows, cols } = this.props;
+    const { className, rows, cols, opacity } = this.props;
     return (
       <canvas
+        style={{ opacity }}
         className={className}
         ref='canvas'
         width={cols * pixelSize}

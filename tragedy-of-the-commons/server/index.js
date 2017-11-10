@@ -1,46 +1,81 @@
-const app = require('./app');
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
-// TODO use mongoose to interact with MongoDB 
-// mongoose.connect('mongodb://localhost/tragedy-of-the-commons');
+require('./db');
 
-const getPixelMatrix = () => { // TODO get it from MongoDB
-  const rows = 350;
-  const cols = 700;
-  const pixelMatrix = [];
+const express = require('express');
+const path = require('path');
+const mongoose = require('mongoose');
+
+const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
+const Canvas = mongoose.model('Canvas');
+const rows = 350;
+const cols = 700;
+
+const blankPixels = (() => {
+  const arr = [];
   for (let row = 0; row < rows; row++) {
-    pixelMatrix.push([]);
     for (let col = 0; col < cols; col++) {
-      pixelMatrix[row].push({
-        row,
-        col,
-        color: 'white'
-      });
+      arr.push('white');
     }
   }
+  return arr;
+}).call();
 
-  pixelMatrix[120][120].color = 'green';
-  pixelMatrix[120][121].color = 'black';
-  pixelMatrix[0][0].color = 'purple';
-  const lastRow = pixelMatrix.length - 1;
-  const lastCol = pixelMatrix[lastRow].length - 1;
-  pixelMatrix[lastRow][lastCol].color = 'purple';
+const getNewCanvas = title => new Canvas({ title, rows, cols, pixels: blankPixels });
 
-  return pixelMatrix;
+const configureNamespace = slug => {
+  const nsp = io.of(`/${slug}`);
+  nsp.on('connection', socket => {
+    Canvas.findOne({ slug }, (err, canvas) => {
+      if (!err) {
+        socket.on('updatePixel', ({ color, index }) => {
+          nsp.emit('pixel', { color, index });
+          const update = { $set: { [`pixels.${index}`]: color } };
+          Canvas.update({ slug }, update, () => {});
+        });
+
+        socket.emit('canvas', canvas);
+      }
+    });
+  });
 };
 
-io.on('connection', socket => {
-  // emit the current pixel matrix
-  socket.emit('pixelMatrix', getPixelMatrix());
+const configureApp = () => {
+  app.get('/', (req, res) => res.redirect('/default'));
 
-  socket.on('updatePixel', data => {
-    // update MongoDB then emit to all sockets
-    io.sockets.emit('updatePixel', data);
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.static(path.resolve(__dirname, '..', 'web/build')));
+
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, '..', 'web/build', 'index.html')));
+
+  app.post('/create', (req, res) => {
+    const title = req.body.title;
+
+    const newCanvas = getNewCanvas(title);
+    newCanvas.save(() => {
+      configureNamespace(newCanvas.slug);
+      res.redirect(`/${newCanvas.slug}`);
+    });
   });
-});
+};
 
-http.listen(port, () => {
-  console.log('listening on port ' + port);
+const startServer = () => {
+  server.listen(port, () => {
+    console.log(`listening on port ${port}`);
+  });
+};
+
+Canvas.findOne({ title: 'default' }, (findErr, defCanvas) => {
+  configureNamespace('default');
+  configureApp();
+
+  if (!defCanvas) {
+    getNewCanvas('default').save(() => startServer());
+  } else {
+    startServer();
+  }
 });
