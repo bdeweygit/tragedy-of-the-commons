@@ -12,31 +12,30 @@ Web and mobile frontends will communicate with the server over WebSockets by way
 
 ## Data Model
 
-Data stored on the server is modeled by two schemas: Pixel and Canvas.
+Data stored on the server is modeled by two schemas: Canvas and Password.
 
-An Example Pixel:
+An Example Password:
 
 ```javascript
 {
-  row: 87,
-  col: 133,
-  color: '#66ff66'
+  hash: // a password hash
+  salt: // a random string
 }
 ```
 
-An Example Private Canvas with Embedded Pixels:
+An Example Private Canvas:
 
 ```javascript
 {
   title: 'AIT Private Canvas',
-  password: // a password hash,
+  password: // a Password
   rows: 350,
   cols: 700,
-  pixels: // an array of Pixels
+  pixels: // an array of strings i.e. ['white', 'green']
 }
 ```
 
-An Example Public Canvas with Embedded Pixels:
+An Example Public Canvas:
 
 ```javascript
 {
@@ -44,7 +43,7 @@ An Example Public Canvas with Embedded Pixels:
   password: null,
   rows: 350,
   cols: 700,
-  pixels: // an array of Pixels
+  pixels: // an array of strings i.e. ['white', 'green']
 }
 ```
 
