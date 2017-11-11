@@ -32,7 +32,7 @@ export default class PixelCanvasScrollView extends React.Component {
         centerContent
         maximumZoomScale={20}
         minimumZoomScale={0.1}
-        style={{ backgroundColor: '#efefef' }}
+        style={{ backgroundColor: '#efefef', width: '100%', height: '100%' }}
         contentContainerStyle={{
           width: this.width + (pixelSize * 20),
           height: this.height + (pixelSize * 20),
