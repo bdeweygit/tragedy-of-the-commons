@@ -12,7 +12,7 @@ Web and mobile frontends will communicate with the server over WebSockets by way
 
 ## Data Model
 
-Data stored on the server is modeled by two schemas: Canvas and Password.
+Data stored on the server is modeled by two schemas: Canvas and Password
 
 An Example Password:
 
@@ -23,7 +23,7 @@ An Example Password:
 }
 ```
 
-An Example Private Canvas:
+An Example Private Canvas with an embedded Password:
 
 ```javascript
 {
@@ -66,7 +66,7 @@ The mobile app is a single screen for editing and searching for canvases.
 
 ## Site map
 
-Since the web frontend is a single page any path from root will be treated by the server as if it were root. What canvas a user sees is managed by socket.io namespaces rather than routes. Cookies will also ensure that a user can refresh their page and still view the canvas that they were viewing rather than being brought back to the default public canvas.
+The site map is dynamic because new canvases created by users create new paths off of index. One path that is guaranteed to exist is /default as this provides the default public canvas. All other paths are created by users, i.e. /my-custom-canvas, /super-secret-canvas, etcetera.
 
 ## User Stories or Use Cases
 
