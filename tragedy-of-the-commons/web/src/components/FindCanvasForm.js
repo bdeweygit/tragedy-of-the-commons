@@ -1,7 +1,7 @@
 import React from 'react';
 import TextInput from './TextInput';
 
-export default class CreateCanvasForm extends React.Component {
+export default class FindCanvasForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { formColor: 'white' };
@@ -14,13 +14,11 @@ export default class CreateCanvasForm extends React.Component {
     })
   }
 
-  onClick(onSubmit) {
+  onClick() {
     const title = this.form.elements[0].value;
-
-    this.props.socket.emit('validateNewTitle', title, valid => {
-      if (valid) {
-        this.form.submit();
-        onSubmit();
+    this.props.socket.emit('findCanvas', title, slug => {
+      if (slug) {
+        window.location.replace(`${window.location.origin}/${slug}`)
       } else {
         this.complain();
       }
@@ -28,7 +26,7 @@ export default class CreateCanvasForm extends React.Component {
   }
 
   render() {
-    const { className, inputWidth, inputHeight, opacity, onSubmit } = this.props;
+    const { className, inputWidth, inputHeight, opacity } = this.props;
     const backgroundColor = this.state.formColor;
     return (
       <div style={{
@@ -40,14 +38,14 @@ export default class CreateCanvasForm extends React.Component {
         alignItems: 'center',
         opacity
       }}>
-        <form ref={ref => this.form = ref} method={'post'} className={className} style={{ backgroundColor }}>
+        <form ref={ref => this.form = ref} method={'get'} className={className} style={{ backgroundColor }}>
           <TextInput label={'Title'} name={'title'}
             style={{
               width: inputWidth,
               height: inputHeight
             }}
           />
-          <button onClick={this.onClick.bind(this, onSubmit)} type={'button'}>Create</button>
+          <button onClick={this.onClick.bind(this)} type={'button'}>Find</button>
         </form>
       </div>
     );

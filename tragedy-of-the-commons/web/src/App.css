@@ -12,8 +12,12 @@
 }
 
 .App-header {
-  padding: 20px;
+  height: 100px;
+  margin-top: 10px;
   color: black;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .App-title {
@@ -32,6 +36,7 @@
 }
 
 .Form {
+  background-color: white;
   padding: 20px;
   width: 500px;
   height: 200px;
