@@ -5,20 +5,40 @@ import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import CreateCanvasForm from './components/CreateCanvasForm';
 import FindCanvasForm from './components/FindCanvasForm';
+import PasswordForm from './components/PasswordForm';
 import BlackButton from './components/BlackButton';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       canvas: {},
-      showLoader: true,
+      showLoader: false,
       showCreateCanvasForm: false,
-      showFindCanvasForm: false
+      showFindCanvasForm: false,
+      showPasswordForm: false
     };
+
     this.socket = io(window.location.pathname);
-    this.socket.on('canvas', canvas => this.setState((prevState) => ({ ...prevState, canvas, showLoader: false })));
-    // socket.on 'private' show a password input
+    this.socket.on('ready', () => {
+      this.socket.emit('requestCanvas', null, canvas => {
+        this.setState(prevState => ({
+          ...prevState,
+          canvas: canvas ? canvas : {},
+          showPasswordForm: canvas ? false : true,
+          showLoader: false
+        }));
+      });
+    });
+  }
+
+  storeCanvas(canvas) {
+    this.setState((prevState) => ({
+      ...prevState,
+      canvas,
+      showPasswordForm: false
+    }));
   }
 
   showLoader(valid) {
@@ -71,27 +91,47 @@ export default class App extends React.Component {
     )
   }
 
+  renderPasswordForm() {
+    return (
+      <PasswordForm
+        socket={this.socket}
+        className={'Form'}
+        inputWidth={'100%'}
+        inputHeight={50}
+        onAccessPrivateCanvas={this.storeCanvas.bind(this)}
+      />
+    )
+  }
+
   renderFormOrNull() {
     return this.state.showCreateCanvasForm ? (
       this.renderCreateCanvasForm()
     ) : this.state.showFindCanvasForm ? (
       this.renderFindCanvasForm()
+    ) : this.state.showPasswordForm ? (
+      this.renderPasswordForm()
     ) : null;
   }
 
-  renderPixelCanvas() {
+  renderPixelCanvasOrNull() {
     const rows = this.state.canvas.rows;
     const cols = this.state.canvas.cols;
+    return this.state.showPasswordForm ? null : (
+      <PixelCanvas
+        className="PixelCanvas"
+        rows={rows}
+        cols={cols}
+        socket={this.socket}
+        canvas={this.state.canvas}
+        opacity={this.state.showLoader ? 0 : 1}
+      />
+    );
+  }
+
+  renderMainContent() {
     return (
       <div className="PixelCanvas-container">
-        <PixelCanvas
-          className="PixelCanvas"
-          rows={rows}
-          cols={cols}
-          socket={this.socket}
-          canvas={this.state.canvas}
-          opacity={this.state.showLoader ? 0 : 1}
-        />
+        {this.renderPixelCanvasOrNull()}
         {this.renderFormOrNull()}
         {this.state.showLoader ? <div style={{ position: 'absolute' }} className="Loader" /> : null}
       </div>
@@ -154,7 +194,8 @@ export default class App extends React.Component {
   }
 
   render() {
-    const contents = Object.keys(this.state.canvas).length > 0 ? this.renderPixelCanvas() : this.renderLoader();
+    const shouldRenderMainContent = Object.keys(this.state.canvas).length > 0 || this.state.showPasswordForm;
+    const contents = shouldRenderMainContent ? this.renderMainContent() : this.renderLoader();
     return this.renderTragedy(contents);
   }
 }

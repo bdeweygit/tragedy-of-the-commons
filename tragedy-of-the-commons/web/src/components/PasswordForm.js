@@ -1,7 +1,7 @@
 import React from 'react';
 import TextInput from './TextInput';
 
-export default class FindCanvasForm extends React.Component {
+export default class PasswordForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { formColor: 'white' };
@@ -15,10 +15,10 @@ export default class FindCanvasForm extends React.Component {
   }
 
   onClick() {
-    const title = this.form.elements[0].value;
-    this.props.socket.emit('findCanvas', title, slug => {
-      if (slug) {
-        window.location.replace(`${window.location.origin}/${slug}`)
+    const password = this.form.elements[0].value;
+    this.props.socket.emit('accessPrivateCanvas', password, canvas => {
+      if (canvas) {
+        this.props.onAccessPrivateCanvas(canvas);
       } else {
         this.complain();
       }
@@ -39,13 +39,13 @@ export default class FindCanvasForm extends React.Component {
         opacity
       }}>
         <form ref={ref => this.form = ref} className={className} style={{ backgroundColor }}>
-          <TextInput label={'Title'} name={'title'}
+          <TextInput label={'Password'} name={'password'}
             style={{
               width: inputWidth,
               height: inputHeight
             }}
           />
-          <button onClick={this.onClick.bind(this)} type={'button'}>Find</button>
+          <button onClick={this.onClick.bind(this)} type={'button'}>Access</button>
         </form>
       </div>
     );

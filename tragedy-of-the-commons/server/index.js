@@ -5,12 +5,14 @@ require('./db');
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 const Canvas = mongoose.model('Canvas');
+const Password = mongoose.model('Password');
 const rows = 350;
 const cols = 700;
 
@@ -24,7 +26,21 @@ const blankPixels = (() => {
   return arr;
 }).call();
 
-const getNewCanvas = title => new Canvas({ title, rows, cols, pixels: blankPixels });
+const getNewPassword = password => {
+  const salt = bcrypt.genSaltSync(1);
+  const hash = bcrypt.hashSync(password, salt);
+  return new Password({
+    hash,
+    salt
+  });
+};
+const getNewCanvas = (title, password) => new Canvas({
+  title,
+  rows,
+  cols,
+  pixels: blankPixels,
+  password: password ? getNewPassword(password) : null
+});
 
 const configureUpdatePixelEvent = (nsp, socket, slug) => {
   socket.on('updatePixel', ({ color, index }) => {
@@ -54,24 +70,44 @@ const configureFindCanvasByTitleEvent = socket => {
   });
 };
 
+const safeCanvas = ({ title, pixels }) => ({ title, pixels, rows, cols });
+
+const configureAccessPrivateCanvasEvent = (nsp, socket, slug) => {
+  socket.on('accessPrivateCanvas', (password, fn) => {
+    Canvas.findOne({ slug }, (err, canvas) => {
+      const salt = canvas.password.salt;
+      const hash = bcrypt.hashSync(password, salt);
+      if (hash === canvas.password.hash) {
+        configureUpdatePixelEvent(nsp, socket, slug);
+        fn(safeCanvas(canvas));
+      } else {
+        fn(false);
+      }
+    });
+  });
+};
+
+const configureRequestCanvasEvent = (nsp, socket, slug) => {
+  socket.on('requestCanvas', (data, fn) => {
+    Canvas.findOne({ slug }, (err, canvas) => {
+      if (canvas.password) {
+        configureAccessPrivateCanvasEvent(nsp, socket, slug);
+        fn(false);
+      } else {
+        configureUpdatePixelEvent(nsp, socket, slug);
+        fn(safeCanvas(canvas));
+      }
+    });
+  });
+};
+
 const configureNamespace = slug => {
   const nsp = io.of(`/${slug}`);
   nsp.on('connection', socket => {
-    Canvas.findOne({ slug }, (err, canvas) => {
-      if (!err) {
-        configureValidateNewTitleEvent(socket);
-        configureFindCanvasByTitleEvent(socket);
-
-        // if canvas is public
-        if (!canvas.password) {
-          configureUpdatePixelEvent(nsp, socket, slug);
-          socket.emit('canvas', canvas);
-        } else {
-          // configure accessPrivateCanvasEvent
-          // socket emit 'private'
-        }
-      }
-    });
+    configureRequestCanvasEvent(nsp, socket, slug);
+    configureValidateNewTitleEvent(socket);
+    configureFindCanvasByTitleEvent(socket);
+    socket.emit('ready');
   });
 };
 
@@ -86,9 +122,10 @@ const configureApp = () => {
 
   app.post('*', (req, res) => {
     const title = req.body.title;
+    const password = req.body.password;
     newCanvasTitleIsValid(title, valid => {
       if (valid) {
-        const newCanvas = getNewCanvas(title.trim());
+        const newCanvas = getNewCanvas(title.trim(), password);
         newCanvas.save(() => {
           configureNamespace(newCanvas.slug);
           res.redirect(`/${newCanvas.slug}`);
