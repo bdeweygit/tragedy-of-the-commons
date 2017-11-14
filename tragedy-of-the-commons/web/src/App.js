@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import hardin from './hardin.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
-import CreateCanvasForm from './components/CreateCanvasForm';
+import NewCanvasForm from './components/NewCanvasForm';
 import FindCanvasForm from './components/FindCanvasForm';
 import PasswordForm from './components/PasswordForm';
 import BlackButton from './components/BlackButton';
@@ -14,8 +14,8 @@ export default class App extends React.Component {
 
     this.state = {
       canvas: {},
-      showLoader: false,
-      showCreateCanvasForm: false,
+      showLoader: true,
+      showNewCanvasForm: false,
       showFindCanvasForm: false,
       showPasswordForm: false
     };
@@ -45,15 +45,15 @@ export default class App extends React.Component {
     this.setState((prevState) => ({
       ...prevState,
       showLoader: true,
-      showCreateCanvasForm: false,
+      showNewCanvasForm: false,
       showFindCanvasForm: false
     }));
   }
 
-  showCreateCanvasForm() {
+  showNewCanvasForm() {
     this.setState((prevState) => ({
       ...prevState,
-      showCreateCanvasForm: true,
+      showNewCanvasForm: true,
       showFindCanvasForm: false,
       showLoader: false
     }));
@@ -63,19 +63,20 @@ export default class App extends React.Component {
     this.setState((prevState) => ({
       ...prevState,
       showFindCanvasForm: true,
-      showCreateCanvasForm: false,
+      showNewCanvasForm: false,
       showLoader: false
     }));
   }
 
-  renderCreateCanvasForm() {
+  renderNewCanvasForm() {
     return (
-      <CreateCanvasForm
+      <NewCanvasForm
         socket={this.socket}
         className={'Form'}
         inputWidth={'100%'}
         inputHeight={50}
         onSubmit={this.showLoader.bind(this)}
+        onClose={() => this.setState(ps => ({ ...ps, showNewCanvasForm: false}))}
       />
     )
   }
@@ -87,6 +88,7 @@ export default class App extends React.Component {
         className={'Form'}
         inputWidth={'100%'}
         inputHeight={50}
+        onClose={() => this.setState(ps => ({ ...ps, showFindCanvasForm: false}))}
       />
     )
   }
@@ -104,8 +106,8 @@ export default class App extends React.Component {
   }
 
   renderFormOrNull() {
-    return this.state.showCreateCanvasForm ? (
-      this.renderCreateCanvasForm()
+    return this.state.showNewCanvasForm ? (
+      this.renderNewCanvasForm()
     ) : this.state.showFindCanvasForm ? (
       this.renderFindCanvasForm()
     ) : this.state.showPasswordForm ? (
@@ -116,14 +118,13 @@ export default class App extends React.Component {
   renderPixelCanvasOrNull() {
     const rows = this.state.canvas.rows;
     const cols = this.state.canvas.cols;
-    return this.state.showPasswordForm ? null : (
+    return this.state.showPasswordForm || this.state.showLoader ? null : (
       <PixelCanvas
         className="PixelCanvas"
         rows={rows}
         cols={cols}
         socket={this.socket}
         canvas={this.state.canvas}
-        opacity={this.state.showLoader ? 0 : 1}
       />
     );
   }
@@ -153,7 +154,7 @@ export default class App extends React.Component {
           <BlackButton
             width={200}
             height={40}
-            text={'New Canvas'} onClick={this.showCreateCanvasForm.bind(this)}
+            text={'New Canvas'} onClick={this.showNewCanvasForm.bind(this)}
           />
           <BlackButton
             width={200}
@@ -194,8 +195,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    const shouldRenderMainContent = Object.keys(this.state.canvas).length > 0 || this.state.showPasswordForm;
-    const contents = shouldRenderMainContent ? this.renderMainContent() : this.renderLoader();
+    const contents = this.state.showLoader ? this.renderLoader() : this.renderMainContent();
     return this.renderTragedy(contents);
   }
 }

@@ -36,10 +36,9 @@ export default class PixelCanvas extends React.Component {
   }
 
   render() {
-    const { className, rows, cols, opacity } = this.props;
+    const { className, rows, cols } = this.props;
     return (
       <canvas
-        style={{ opacity }}
         className={className}
         ref='canvas'
         width={cols * pixelSize}

@@ -1,5 +1,6 @@
 import React from 'react';
 import TextInput from './TextInput';
+import BlackButton from './BlackButton';
 
 export default class PasswordForm extends React.Component {
   constructor(props) {
@@ -39,13 +40,13 @@ export default class PasswordForm extends React.Component {
         opacity
       }}>
         <form ref={ref => this.form = ref} className={className} style={{ backgroundColor }}>
-          <TextInput label={'Password'} name={'password'}
+          <TextInput label={'Password'} name={'password'} type={'password'}
             style={{
               width: inputWidth,
               height: inputHeight
             }}
           />
-          <button onClick={this.onClick.bind(this)} type={'button'}>Access</button>
+          <BlackButton onClick={this.onClick.bind(this)} text={'Access'} />
         </form>
       </div>
     );

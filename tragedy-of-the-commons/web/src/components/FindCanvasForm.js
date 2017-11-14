@@ -1,5 +1,6 @@
 import React from 'react';
 import TextInput from './TextInput';
+import BlackButton from './BlackButton';
 
 export default class FindCanvasForm extends React.Component {
   constructor(props) {
@@ -15,7 +16,7 @@ export default class FindCanvasForm extends React.Component {
   }
 
   onClick() {
-    const title = this.form.elements[0].value;
+    const title = this.form.elements.title.value;
     this.props.socket.emit('findCanvas', title, slug => {
       if (slug) {
         window.location.replace(`${window.location.origin}/${slug}`)
@@ -26,7 +27,7 @@ export default class FindCanvasForm extends React.Component {
   }
 
   render() {
-    const { className, inputWidth, inputHeight, opacity } = this.props;
+    const { className, inputWidth, inputHeight, onClose } = this.props;
     const backgroundColor = this.state.formColor;
     return (
       <div style={{
@@ -35,17 +36,17 @@ export default class FindCanvasForm extends React.Component {
         width: '100%',
         marginTop: 100,
         justifyContent: 'center',
-        alignItems: 'center',
-        opacity
+        alignItems: 'center'
       }}>
         <form ref={ref => this.form = ref} className={className} style={{ backgroundColor }}>
+          <BlackButton onClick={onClose} text={'Close'} />
           <TextInput label={'Title'} name={'title'}
             style={{
               width: inputWidth,
               height: inputHeight
             }}
           />
-          <button onClick={this.onClick.bind(this)} type={'button'}>Find</button>
+          <BlackButton onClick={this.onClick.bind(this)} text={'Find'} width={200} height={40} />
         </form>
       </div>
     );

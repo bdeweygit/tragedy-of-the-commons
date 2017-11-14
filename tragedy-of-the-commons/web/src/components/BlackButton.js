@@ -6,7 +6,13 @@ export default class BlackButton extends React.Component {
     const { onClick, text, width, height } = this.props;
     return (
       <div>
-        <button onClick={onClick} style={{ color: 'white', backgroundColor: 'black', width, height }}>
+        <button onClick={onClick} type={'button'} style={{
+            color: 'white',
+            backgroundColor: 'black',
+            width,
+            height
+          }}
+        >
           {text}
         </button>
       </div>

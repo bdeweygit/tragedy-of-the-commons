@@ -1,7 +1,8 @@
 import React from 'react';
 import TextInput from './TextInput';
+import BlackButton from './BlackButton';
 
-export default class CreateCanvasForm extends React.Component {
+export default class NewCanvasForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { formColor: 'white', showPasswordInput: false };
@@ -15,7 +16,7 @@ export default class CreateCanvasForm extends React.Component {
   }
 
   onClickButton(onSubmit) {
-    const title = this.form.elements[0].value;
+    const title = this.form.elements.title.value;
 
     this.props.socket.emit('validateNewTitle', title, valid => {
       if (valid) {
@@ -48,7 +49,7 @@ export default class CreateCanvasForm extends React.Component {
   }
 
   render() {
-    const { className, inputWidth, inputHeight, opacity, onSubmit } = this.props;
+    const { className, inputWidth, inputHeight, onSubmit, onClose } = this.props;
     const showPasswordInput = this.state.showPasswordInput;
     const backgroundColor = this.state.formColor;
     return (
@@ -59,9 +60,9 @@ export default class CreateCanvasForm extends React.Component {
         marginTop: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity
       }}>
         <form ref={ref => this.form = ref} method={'post'} className={className} style={{ backgroundColor }}>
+          <BlackButton onClick={onClose} text={'Close'} />
           <TextInput label={'Title'} name={'title'}
             style={{
               width: inputWidth,
@@ -86,7 +87,7 @@ export default class CreateCanvasForm extends React.Component {
             />
           </div>
           {this.renderPasswordInputOrNull()}
-          <button onClick={this.onClickButton.bind(this, onSubmit)} type={'button'}>Create</button>
+          <BlackButton onClick={this.onClickButton.bind(this, onSubmit)} text={'Create'} width={200} height={40} />
         </form>
       </div>
     );

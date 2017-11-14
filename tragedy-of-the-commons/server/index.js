@@ -34,6 +34,7 @@ const getNewPassword = password => {
     salt
   });
 };
+
 const getNewCanvas = (title, password) => new Canvas({
   title,
   rows,
@@ -57,15 +58,15 @@ const newCanvasTitleIsValid = (title, onValid) => {
 };
 
 const configureValidateNewTitleEvent = socket => {
-  socket.on('validateNewTitle', (title, fn) => {
-    newCanvasTitleIsValid(title.trim(), fn);
+  socket.on('validateNewTitle', (title, ackFn) => {
+    newCanvasTitleIsValid(title.trim(), ackFn);
   });
 };
 
 const configureFindCanvasByTitleEvent = socket => {
-  socket.on('findCanvas', (title, fn) => {
+  socket.on('findCanvas', (title, ackFn) => {
     Canvas.findOne({ title: title.trim() }, (err, canvas) => {
-      fn(canvas ? canvas.slug : false);
+      ackFn(canvas ? canvas.slug : false);
     });
   });
 };
@@ -73,29 +74,29 @@ const configureFindCanvasByTitleEvent = socket => {
 const safeCanvas = ({ title, pixels }) => ({ title, pixels, rows, cols });
 
 const configureAccessPrivateCanvasEvent = (nsp, socket, slug) => {
-  socket.on('accessPrivateCanvas', (password, fn) => {
+  socket.on('accessPrivateCanvas', (password, ackFn) => {
     Canvas.findOne({ slug }, (err, canvas) => {
       const salt = canvas.password.salt;
       const hash = bcrypt.hashSync(password, salt);
       if (hash === canvas.password.hash) {
         configureUpdatePixelEvent(nsp, socket, slug);
-        fn(safeCanvas(canvas));
+        ackFn(safeCanvas(canvas));
       } else {
-        fn(false);
+        ackFn(false);
       }
     });
   });
 };
 
 const configureRequestCanvasEvent = (nsp, socket, slug) => {
-  socket.on('requestCanvas', (data, fn) => {
+  socket.on('requestCanvas', (data, ackFn) => {
     Canvas.findOne({ slug }, (err, canvas) => {
       if (canvas.password) {
         configureAccessPrivateCanvasEvent(nsp, socket, slug);
-        fn(false);
+        ackFn(false);
       } else {
         configureUpdatePixelEvent(nsp, socket, slug);
-        fn(safeCanvas(canvas));
+        ackFn(safeCanvas(canvas));
       }
     });
   });
