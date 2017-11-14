@@ -15,6 +15,7 @@ const Canvas = mongoose.model('Canvas');
 const Password = mongoose.model('Password');
 const rows = 350;
 const cols = 700;
+const defaultCanvasTitle = 'TRAGEDY OF THE COMMONS';
 
 const blankPixels = (() => {
   const arr = [];
@@ -26,7 +27,20 @@ const blankPixels = (() => {
   return arr;
 }).call();
 
-const getNewPassword = password => {
+const joinRoom = (socket, room) => {
+  // slice(1) because first index is socket's Id
+  const rooms = Object.keys(socket.rooms).slice(1);
+  rooms.forEach(oldRoom => socket.leave(oldRoom));
+  socket.join(room);
+};
+
+const titleIsAvail = (title, onAvail) => {
+  Canvas.findOne({ title }, (err, canvas) => {
+    onAvail(title !== '' && !canvas);
+  });
+};
+
+const makePassword = password => {
   const salt = bcrypt.genSaltSync(1);
   const hash = bcrypt.hashSync(password, salt);
   return new Password({
@@ -35,126 +49,134 @@ const getNewPassword = password => {
   });
 };
 
-const getNewCanvas = (title, password) => new Canvas({
+const makeCanvas = (title, password) => new Canvas({
   title,
   rows,
   cols,
   pixels: blankPixels,
-  password: password ? getNewPassword(password) : null
+  password: password ? makePassword(password) : null
 });
 
-const configureUpdatePixelEvent = (nsp, socket, slug) => {
-  socket.on('updatePixel', ({ color, index }) => {
-    nsp.emit('pixel', { color, index });
-    const update = { $set: { [`pixels.${index}`]: color } };
-    Canvas.update({ slug }, update, () => {});
+const makeAndSaveCanvas = (title, password, cb) => {
+  const canvas = makeCanvas(title, password);
+  canvas.save((err, doc) => {
+    cb(doc);
   });
 };
 
-const newCanvasTitleIsValid = (title, onValid) => {
-  Canvas.findOne({ title: title.trim() }, (err, canvas) => {
-    onValid(title.trim() !== '' && !canvas);
-  });
-};
-
-const configureValidateNewTitleEvent = socket => {
-  socket.on('validateNewTitle', (title, ackFn) => {
-    newCanvasTitleIsValid(title.trim(), ackFn);
-  });
-};
-
-const configureFindCanvasByTitleEvent = socket => {
-  socket.on('findCanvas', (title, ackFn) => {
-    Canvas.findOne({ title: title.trim() }, (err, canvas) => {
-      ackFn(canvas ? canvas.slug : false);
-    });
-  });
-};
-
-const safeCanvas = ({ title, pixels }) => ({ title, pixels, rows, cols });
-
-const configureAccessPrivateCanvasEvent = (nsp, socket, slug) => {
-  socket.on('accessPrivateCanvas', (password, ackFn) => {
-    Canvas.findOne({ slug }, (err, canvas) => {
-      const salt = canvas.password.salt;
-      const hash = bcrypt.hashSync(password, salt);
-      if (hash === canvas.password.hash) {
-        configureUpdatePixelEvent(nsp, socket, slug);
-        ackFn(safeCanvas(canvas));
-      } else {
-        ackFn(false);
+const configureOnCreate = socket => {
+  socket.on('create', ({ title, password }, ackFn) => {
+    const payload = {
+      canvas: {},
+      error: {
+        title: false,
+        password: false
       }
-    });
+    };
+
+    title = title.trim();
+
+    if (!password) {
+      payload.error.password = true;
+      ackFn(payload);
+    } else if (!title) {
+      payload.error.title = true;
+      ackFn(payload);
+    } else {
+      titleIsAvail(title, avail => {
+        if (avail) {
+          makeAndSaveCanvas(title, password, doc => {
+            payload.canvas = doc;
+            ackFn(payload);
+          });
+        } else {
+          payload.error.title = true;
+          ackFn(payload);
+        }
+      });
+    }
   });
 };
 
-const configureRequestCanvasEvent = (nsp, socket, slug) => {
-  socket.on('requestCanvas', (data, ackFn) => {
-    Canvas.findOne({ slug }, (err, canvas) => {
-      if (canvas.password) {
-        configureAccessPrivateCanvasEvent(nsp, socket, slug);
-        ackFn(false);
+const configureOnJoin = socket => {
+  socket.on('join', ({ title, password }, ackFn) => {
+    Canvas.findOne({ title }, (err, canvas) => {
+      const payload = {
+        canvas: {},
+        error: {
+          title: false,
+          password: false
+        }
+      };
+
+      if (canvas) {
+        if (canvas.password) {
+          const salt = canvas.password.salt;
+          const hash = bcrypt.hashSync(password, salt);
+          if (hash === canvas.password.hash) {
+            payload.canvas = canvas;
+            joinRoom(socket, canvas._id);
+          } else {
+            payload.error.password = true;
+          }
+        } else {
+          payload.canvas = canvas;
+          joinRoom(socket, canvas._id);
+        }
       } else {
-        configureUpdatePixelEvent(nsp, socket, slug);
-        ackFn(safeCanvas(canvas));
+        payload.error.title = true;
       }
+      ackFn(payload);
     });
   });
 };
 
-const configureNamespace = slug => {
-  const nsp = io.of(`/${slug}`);
-  nsp.on('connection', socket => {
-    configureRequestCanvasEvent(nsp, socket, slug);
-    configureValidateNewTitleEvent(socket);
-    configureFindCanvasByTitleEvent(socket);
-    socket.emit('ready');
+const configureOnPixel = socket => {
+  socket.on('pixel', ({ color, index, _id, passHash }) => {
+    const query = { _id, 'password.hash': passHash };
+    const doc = { $set: { [`pixels.${index}`]: color } };
+    const cb = () => io.sockets.to(_id).emit({ color, index });
+    Canvas.findOneAndUpdate(query, doc, cb);
+  });
+};
+
+const configureIo = defaultCanvas => {
+  io.on('connection', socket => {
+    joinRoom(socket, defaultCanvas._id);
+    socket.emit('canvas', { canvas: defaultCanvas });
+
+    configureOnCreate(socket);
+    configureOnJoin(socket);
+    configureOnPixel(socket);
   });
 };
 
 const configureApp = () => {
-  app.get('/', (req, res) => res.redirect('/default'));
-
   app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.resolve(__dirname, '..', 'web/build')));
 
-  app.get('*', (req, res) =>
+  app.get('/', (req, res) =>
     res.sendFile(path.resolve(__dirname, '..', 'web/build', 'index.html')));
 
-  app.post('*', (req, res) => {
-    const title = req.body.title;
-    const password = req.body.password;
-    newCanvasTitleIsValid(title, valid => {
-      if (valid) {
-        const newCanvas = getNewCanvas(title.trim(), password);
-        newCanvas.save(() => {
-          configureNamespace(newCanvas.slug);
-          res.redirect(`/${newCanvas.slug}`);
-        });
-      } else {
-        res.end();
-      }
-    });
-  });
+  app.get('*', (req, res) => res.redirect('/'));
 };
 
-const startServer = () => {
+const startServer = defaultCanvas => {
+  configureIo(defaultCanvas);
   configureApp();
   server.listen(port, () => {
     console.log(`listening on port ${port}`);
   });
 };
 
-Canvas.findAlias = Canvas.find; // esLint assumes .find is for arrays and wants a return value
-Canvas.findAlias((err, canvases) => {
-  canvases.forEach(({ slug }) => configureNamespace(slug));
-
-  Canvas.findOne({ title: 'default' }, (findErr, defCanvas) => {
-    if (!defCanvas) {
-      configureNamespace('default');
-      getNewCanvas('default').save(() => startServer());
+const init = () => {
+  Canvas.findOne({ title: defaultCanvasTitle }, (error, defaultCanvas) => {
+    if (!defaultCanvas) {
+      makeAndSaveCanvas(defaultCanvasTitle, null, doc => startServer(doc));
     } else {
-      startServer();
+      startServer(defaultCanvas);
     }
   });
-});
+};
+
+init();

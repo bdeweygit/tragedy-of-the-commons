@@ -17,11 +17,15 @@ export default class App extends React.Component {
       showLoader: true,
       showNewCanvasForm: false,
       showFindCanvasForm: false,
-      showPasswordForm: false
+      showPasswordForm: false,
+      room: 'TRAGEDY OF THE COMMONS'
     };
 
-    this.socket = io(window.location.pathname);
-    this.socket.on('ready', () => {
+    this.socket = io({ query : { room: this.state.room } });
+
+    this.socket.on('connection', () => {
+      this.socket.emit();
+      this.socket.join(this.state.room);
       this.socket.emit('requestCanvas', null, canvas => {
         this.setState(prevState => ({
           ...prevState,
