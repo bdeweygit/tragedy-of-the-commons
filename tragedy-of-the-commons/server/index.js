@@ -66,32 +66,19 @@ const makeAndSaveCanvas = (title, password, cb) => {
 
 const configureOnCreate = socket => {
   socket.on('create', ({ title, password }, ackFn) => {
-    const payload = {
-      canvas: {},
-      error: {
-        title: false,
-        password: false
-      }
-    };
-
     title = title.trim();
 
-    if (!password) {
-      payload.error.password = true;
-      ackFn(payload);
-    } else if (!title) {
-      payload.error.title = true;
-      ackFn(payload);
+    if (!title) {
+      ackFn(false);
     } else {
       titleIsAvail(title, avail => {
         if (avail) {
+          ackFn(true);
           makeAndSaveCanvas(title, password, doc => {
-            payload.canvas = doc;
-            ackFn(payload);
+            socket.emit('canvas', { canvas: doc });
           });
         } else {
-          payload.error.title = true;
-          ackFn(payload);
+          ackFn(false);
         }
       });
     }
@@ -102,7 +89,7 @@ const configureOnJoin = socket => {
   socket.on('join', ({ title, password }, ackFn) => {
     Canvas.findOne({ title }, (err, canvas) => {
       const payload = {
-        canvas: {},
+        canvas: null,
         error: {
           title: false,
           password: false
@@ -111,11 +98,15 @@ const configureOnJoin = socket => {
 
       if (canvas) {
         if (canvas.password) {
-          const salt = canvas.password.salt;
-          const hash = bcrypt.hashSync(password, salt);
-          if (hash === canvas.password.hash) {
-            payload.canvas = canvas;
-            joinRoom(socket, canvas._id);
+          if (password) {
+            const salt = canvas.password.salt;
+            const hash = bcrypt.hashSync(password, salt);
+            if (hash === canvas.password.hash) {
+              payload.canvas = canvas;
+              joinRoom(socket, canvas._id);
+            } else {
+              payload.error.password = true;
+            }
           } else {
             payload.error.password = true;
           }

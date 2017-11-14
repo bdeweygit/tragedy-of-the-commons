@@ -15,17 +15,21 @@ export default class NewCanvasForm extends React.Component {
     })
   }
 
-  onClickButton(onSubmit) {
+  onClickButton() {
     const title = this.form.elements.title.value;
+    const password = this.form.elements.password ? this.form.elements.password.value : null;
 
-    this.props.socket.emit('validateNewTitle', title, valid => {
-      if (valid) {
-        this.form.submit();
-        onSubmit();
-      } else {
-        this.complain();
-      }
-    });
+    if (title === '' || password === '') {
+      this.complain();
+    } else {
+      this.props.socket.emit('create', { title, password }, success => {
+        if (!success) {
+          this.complain();
+        } else {
+          this.props.onCreate();
+        }
+      });
+    }
   }
 
   onClickPublicRadio() {
@@ -49,7 +53,7 @@ export default class NewCanvasForm extends React.Component {
   }
 
   render() {
-    const { className, inputWidth, inputHeight, onSubmit, onClose } = this.props;
+    const { className, inputWidth, inputHeight, onClose } = this.props;
     const showPasswordInput = this.state.showPasswordInput;
     const backgroundColor = this.state.formColor;
     return (
@@ -87,7 +91,7 @@ export default class NewCanvasForm extends React.Component {
             />
           </div>
           {this.renderPasswordInputOrNull()}
-          <BlackButton onClick={this.onClickButton.bind(this, onSubmit)} text={'Create'} width={200} height={40} />
+          <BlackButton onClick={this.onClickButton.bind(this)} text={'Create'} width={200} height={40} />
         </form>
       </div>
     );

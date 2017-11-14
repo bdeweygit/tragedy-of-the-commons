@@ -15,12 +15,6 @@ export default class PixelCanvas extends React.Component {
       ctx.fillStyle = color;
       ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
     });
-
-    // let color = 'red'
-    // setInterval(() => {
-    //   props.socket.emit('updatePixel', { color, index: 0 });
-    //   color = color === 'red' ? 'blue' : 'red';
-    // }, 500);
   }
 
   componentDidMount() {

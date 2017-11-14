@@ -4,8 +4,7 @@ import hardin from './hardin.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import NewCanvasForm from './components/NewCanvasForm';
-import FindCanvasForm from './components/FindCanvasForm';
-import PasswordForm from './components/PasswordForm';
+import JoinCanvasForm from './components/JoinCanvasForm';
 import BlackButton from './components/BlackButton';
 
 export default class App extends React.Component {
@@ -13,60 +12,51 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      canvas: {},
+      canvas: null,
       showLoader: true,
       showNewCanvasForm: false,
-      showFindCanvasForm: false,
-      showPasswordForm: false,
-      room: 'TRAGEDY OF THE COMMONS'
+      showJoinCanvasForm: false
     };
 
-    this.socket = io({ query : { room: this.state.room } });
-
-    this.socket.on('connection', () => {
-      this.socket.emit();
-      this.socket.join(this.state.room);
-      this.socket.emit('requestCanvas', null, canvas => {
-        this.setState(prevState => ({
-          ...prevState,
-          canvas: canvas ? canvas : {},
-          showPasswordForm: canvas ? false : true,
-          showLoader: false
-        }));
-      });
-    });
+    this.socket = io();
+    this.socket.on('canvas', ({ canvas }) => this.setCanvas(canvas));
   }
 
-  storeCanvas(canvas) {
-    this.setState((prevState) => ({
+  setCanvas(canvas) {
+    this.setState(prevState => ({
       ...prevState,
       canvas,
-      showPasswordForm: false
-    }));
-  }
-
-  showLoader(valid) {
-    this.setState((prevState) => ({
-      ...prevState,
-      showLoader: true,
       showNewCanvasForm: false,
-      showFindCanvasForm: false
-    }));
-  }
-
-  showNewCanvasForm() {
-    this.setState((prevState) => ({
-      ...prevState,
-      showNewCanvasForm: true,
-      showFindCanvasForm: false,
+      showJoinCanvasForm: false,
       showLoader: false
     }));
   }
 
-  showFindCanvasForm() {
-    this.setState((prevState) => ({
+  joinDefaultCanvas() {
+    const query = { title: 'TRAGEDY OF THE COMMONS' };
+    this.socket.emit('join', query, ({ canvas }) => this.setCanvas(canvas));
+  }
+
+  showLoader(valid) {
+    this.setState(prevState => ({
       ...prevState,
-      showFindCanvasForm: true,
+      showLoader: true
+    }));
+  }
+
+  showNewCanvasForm() {
+    this.setState(prevState => ({
+      ...prevState,
+      showNewCanvasForm: true,
+      showJoinCanvasForm: false,
+      showLoader: false
+    }));
+  }
+
+  showJoinCanvasForm() {
+    this.setState(prevState => ({
+      ...prevState,
+      showJoinCanvasForm: true,
       showNewCanvasForm: false,
       showLoader: false
     }));
@@ -79,32 +69,21 @@ export default class App extends React.Component {
         className={'Form'}
         inputWidth={'100%'}
         inputHeight={50}
-        onSubmit={this.showLoader.bind(this)}
+        onCreate={this.showLoader.bind(this)}
         onClose={() => this.setState(ps => ({ ...ps, showNewCanvasForm: false}))}
       />
     )
   }
 
-  renderFindCanvasForm() {
+  renderJoinCanvasForm() {
     return (
-      <FindCanvasForm
+      <JoinCanvasForm
         socket={this.socket}
         className={'Form'}
         inputWidth={'100%'}
         inputHeight={50}
-        onClose={() => this.setState(ps => ({ ...ps, showFindCanvasForm: false}))}
-      />
-    )
-  }
-
-  renderPasswordForm() {
-    return (
-      <PasswordForm
-        socket={this.socket}
-        className={'Form'}
-        inputWidth={'100%'}
-        inputHeight={50}
-        onAccessPrivateCanvas={this.storeCanvas.bind(this)}
+        onCanvas={this.setCanvas.bind(this)}
+        onClose={() => this.setState(ps => ({ ...ps, showJoinCanvasForm: false}))}
       />
     )
   }
@@ -112,17 +91,15 @@ export default class App extends React.Component {
   renderFormOrNull() {
     return this.state.showNewCanvasForm ? (
       this.renderNewCanvasForm()
-    ) : this.state.showFindCanvasForm ? (
-      this.renderFindCanvasForm()
-    ) : this.state.showPasswordForm ? (
-      this.renderPasswordForm()
+    ) : this.state.showJoinCanvasForm ? (
+      this.renderJoinCanvasForm()
     ) : null;
   }
 
   renderPixelCanvasOrNull() {
     const rows = this.state.canvas.rows;
     const cols = this.state.canvas.cols;
-    return this.state.showPasswordForm || this.state.showLoader ? null : (
+    return this.state.showLoader ? null : (
       <PixelCanvas
         className="PixelCanvas"
         rows={rows}
@@ -163,7 +140,7 @@ export default class App extends React.Component {
           <BlackButton
             width={200}
             height={40}
-            text={'Find Canvas'} onClick={this.showFindCanvasForm.bind(this)}
+            text={'Join Canvas'} onClick={this.showJoinCanvasForm.bind(this)}
           />
         </div>
       )
@@ -180,19 +157,30 @@ export default class App extends React.Component {
     );
   }
 
-  renderTragedy(contents) {
+  renderHeaderOrNull() {
+    const { canvas } = this.state;
+    const title = canvas ? canvas.title : 'TRAGEDY OF THE COMMONS';
+    return this.state.showLoader ? null : (
+      <header className="App-header">
+        {this.renderQR()}
+        <div style={{ flex: 1 }}>
+          <input type="image"
+            src={hardin}
+            className="App-logo"
+            alt={'logo'}
+            onClick={this.joinDefaultCanvas.bind(this)}
+          />
+          <h1 className="App-title">{title}</h1>
+        </div>
+        {this.renderButtons()}
+      </header>
+    );
+  }
+
+  renderApp(contents) {
     return (
       <div className="App">
-        <header className="App-header">
-          {this.renderQR()}
-          <div style={{ flex: 1 }}>
-            <a href={`${window.location.origin}`}>
-              <img src={hardin} className="App-logo" alt="logo" />
-            </a>
-            <h1 className="App-title">TRAGEDY OF THE COMMONS</h1>
-          </div>
-          {this.renderButtons()}
-        </header>
+        {this.renderHeaderOrNull()}
         {contents}
       </div>
     );
@@ -200,6 +188,6 @@ export default class App extends React.Component {
 
   render() {
     const contents = this.state.showLoader ? this.renderLoader() : this.renderMainContent();
-    return this.renderTragedy(contents);
+    return this.renderApp(contents);
   }
 }
