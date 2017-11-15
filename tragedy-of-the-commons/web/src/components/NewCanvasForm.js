@@ -65,7 +65,13 @@ export default class NewCanvasForm extends React.Component {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-        <form ref={ref => this.form = ref} method={'post'} className={className} style={{ backgroundColor }}>
+        <form
+          ref={ref => this.form = ref}
+          method={'post'}
+          className={className}
+          style={{ backgroundColor }}
+          onSubmit={e => e.preventDefault()}
+        >
           <BlackButton onClick={onClose} text={'Close'} />
           <TextInput label={'Title'} name={'title'}
             style={{

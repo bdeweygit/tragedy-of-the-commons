@@ -23,7 +23,7 @@ Canvas.plugin(URLSlugs('title'));
 mongoose.model('Canvas', Canvas);
 mongoose.model('Password', Password);
 
-// NOTE execute this file before using the Canvas model by calling require('db.js');
+// NOTE execute this file before using the models by calling require('db.js');
 
 
 // is the environment variable, NODE_ENV, set to PRODUCTION?

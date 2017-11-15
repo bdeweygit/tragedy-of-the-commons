@@ -126,7 +126,13 @@ const configureOnPixel = socket => {
   socket.on('pixel', ({ color, index, _id, passHash }) => {
     const query = { _id, 'password.hash': passHash };
     const doc = { $set: { [`pixels.${index}`]: color } };
-    const cb = () => io.sockets.to(_id).emit({ color, index });
+    const cb = err => {
+      if (!err) {
+        io.sockets.to(_id).emit({ color, index });
+      } else {
+        console.log(err);
+      }
+    };
     Canvas.findOneAndUpdate(query, doc, cb);
   });
 };
@@ -134,11 +140,12 @@ const configureOnPixel = socket => {
 const configureIo = defaultCanvas => {
   io.on('connection', socket => {
     joinRoom(socket, defaultCanvas._id);
-    socket.emit('canvas', { canvas: defaultCanvas });
-
+    
     configureOnCreate(socket);
     configureOnJoin(socket);
     configureOnPixel(socket);
+
+    socket.emit('canvas', { canvas: defaultCanvas });
   });
 };
 

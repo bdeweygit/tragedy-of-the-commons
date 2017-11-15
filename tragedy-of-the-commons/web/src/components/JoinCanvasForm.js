@@ -92,7 +92,12 @@ export default class JoinCanvasForm extends React.Component {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <form ref={ref => this.form = ref} className={className} style={{ backgroundColor }}>
+        <form
+          ref={ref => this.form = ref}
+          className={className}
+          style={{ backgroundColor }}
+          onSubmit={e => e.preventDefault()}
+        >
           <BlackButton onClick={onClose} text={'Close'} />
           {this.renderInput(inputWidth, inputHeight)}
           <BlackButton onClick={this.onClickButton.bind(this)} text={buttonText} width={200} height={40} />
