@@ -52,7 +52,7 @@ An Example Public Canvas:
 
 ## Wireframes
 
-The web app is a single page application for viewing, creating, and searching for canvases.
+The web app is a single page application for viewing and creating canvases.
 
 ![web](documentation/web.png)
 
@@ -66,7 +66,7 @@ The mobile app is a single screen for editing and searching for canvases.
 
 ## Site map
 
-The site map is dynamic because new canvases created by users create new paths off of index. One path that is guaranteed to exist is /default as this provides the default public canvas. All other paths are created by users, i.e. /my-custom-canvas, /super-secret-canvas, etcetera.
+Since this is a single page application the site map can be modeled as a single route: '/'. All others routes will redirect to '/'.
 
 ## User Stories or Use Cases
 
