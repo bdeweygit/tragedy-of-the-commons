@@ -58,7 +58,9 @@ export default class PixelCanvas extends React.Component {
   }
 
   render() {
-    const { width, height, toggleColorSelector, pixelSize, socket, canvas } = this.props;
+    const { width, height, pixelSize, socket, canvas } = this.props;
+    const { _id, password } = canvas;
+    const hash = password ? password.hash : null;
     return (
       <View
         style={{
@@ -71,12 +73,11 @@ export default class PixelCanvas extends React.Component {
         onStartShouldSetResponder={() => true}
         onMoveShouldSetResponder={() => true}
         onResponderRelease={event => {
-          //toggleColorSelector();
           const { locationX, locationY } = event.nativeEvent;
           const col = this.convertLocationToPosition(locationX);
           const row = this.convertLocationToPosition(locationY);
           const index = col + (row * canvas.cols);
-          socket.emit('updatePixel', { index, color: 'black' });
+          socket.emit('pixel', { index, color: 'black', _id, hash });
         }}
       >
         <WebView

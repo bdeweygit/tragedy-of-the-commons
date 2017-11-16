@@ -123,29 +123,32 @@ const configureOnJoin = socket => {
 };
 
 const configureOnPixel = socket => {
-  socket.on('pixel', ({ color, index, _id, passHash }) => {
-    const query = { _id, 'password.hash': passHash };
+  socket.on('pixel', ({ color, index, _id, hash }) => {
+    const query = hash ? { _id, 'password.hash': hash } : { _id };
     const doc = { $set: { [`pixels.${index}`]: color } };
     const cb = err => {
       if (!err) {
-        io.sockets.to(_id).emit({ color, index });
+        io.sockets.to(_id).emit('pixel', { color, index });
       } else {
         console.log(err);
       }
     };
+
     Canvas.findOneAndUpdate(query, doc, cb);
   });
 };
 
-const configureIo = defaultCanvas => {
+const configureIo = () => {
   io.on('connection', socket => {
-    joinRoom(socket, defaultCanvas._id);
-    
-    configureOnCreate(socket);
-    configureOnJoin(socket);
-    configureOnPixel(socket);
+    Canvas.findOne({ title: defaultCanvasTitle }, (error, defaultCanvas) => {
+      joinRoom(socket, defaultCanvas._id);
 
-    socket.emit('canvas', { canvas: defaultCanvas });
+      configureOnCreate(socket);
+      configureOnJoin(socket);
+      configureOnPixel(socket);
+
+      socket.emit('canvas', { canvas: defaultCanvas });
+    });
   });
 };
 
@@ -159,8 +162,8 @@ const configureApp = () => {
   app.get('*', (req, res) => res.redirect('/'));
 };
 
-const startServer = defaultCanvas => {
-  configureIo(defaultCanvas);
+const startServer = () => {
+  configureIo();
   configureApp();
   server.listen(port, () => {
     console.log(`listening on port ${port}`);
@@ -170,9 +173,9 @@ const startServer = defaultCanvas => {
 const init = () => {
   Canvas.findOne({ title: defaultCanvasTitle }, (error, defaultCanvas) => {
     if (!defaultCanvas) {
-      makeAndSaveCanvas(defaultCanvasTitle, null, doc => startServer(doc));
+      makeAndSaveCanvas(defaultCanvasTitle, null, () => startServer());
     } else {
-      startServer(defaultCanvas);
+      startServer();
     }
   });
 };
