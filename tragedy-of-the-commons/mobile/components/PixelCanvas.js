@@ -6,10 +6,8 @@ export default class PixelCanvas extends React.Component {
   constructor(props) {
     super(props);
 
-    this.webView = null;
-
-    const { pixelSize, canvas } = this.props;
-    const { rows, cols, pixels } = canvas;
+    const { rows, cols } = props.canvas;
+    const pixelSize = props.pixelSize;
 
     this.html = `
       <!DOCTYPE html>
@@ -26,30 +24,53 @@ export default class PixelCanvas extends React.Component {
           <canvas id="myCanvas"
             width="${cols * pixelSize}"
             height="${rows * pixelSize}"
-            style="background-color: aqua; width: 100%; height: 100%"
+            style="background-color: white; width: 100%; height: 100%"
           />
 
           <script>
-            const c = document.getElementById("myCanvas");
-            const ctx = c.getContext("2d");
-            [${pixels.map(color => `'${color}'`)}].forEach((color, index) => {
-              const row = Math.floor(index / ${cols}) * ${pixelSize};
-              const col = (index % ${cols}) * ${pixelSize};
-              ctx.fillStyle = color;
-              ctx.fillRect(col, row, ${pixelSize}, ${pixelSize});
-            });
-
             document.addEventListener("message", ({ data }) => {
-              const [ color, index ] = data.split(":");
-              const row = Math.floor(index / ${cols}) * ${pixelSize};
-              const col = (index % ${cols}) * ${pixelSize};
-              ctx.fillStyle = color;
-              ctx.fillRect(col, row, ${pixelSize}, ${pixelSize});
+              const [ command, payload ] = data.split(":");
+
+              const c = document.getElementById("myCanvas");
+              const ctx = c.getContext("2d");
+
+              if (command === "draw") {
+                payload.split(',').forEach((color, index) => {
+                  const row = Math.floor(index / ${cols}) * ${pixelSize};
+                  const col = (index % ${cols}) * ${pixelSize};
+                  ctx.fillStyle = color;
+                  ctx.fillRect(col, row, ${pixelSize}, ${pixelSize});
+                });
+              } else if (command === "pixel") {
+                const [ color, index ] = payload.split(',');
+                const row = Math.floor(index / ${cols}) * ${pixelSize};
+                const col = (index % ${cols}) * ${pixelSize};
+                ctx.fillStyle = color;
+                ctx.fillRect(col, row, ${pixelSize}, ${pixelSize});
+              }
             });
           </script>
         </body>
       </html>
     `;
+  }
+
+  componentDidMount() {
+    const pixels = this.props.canvas.pixels;
+    this.webView.postMessage(`draw:${pixels.toString()}`);
+
+    this.props.socket.on('pixel', ({ color, index }) => {
+      this.webView.postMessage(`pixel:${color},${index}`);
+    });
+  }
+
+  shouldComponentUpdate({ canvas }) {
+    return canvas._id !== this.props.canvas._id;
+  }
+
+  componentDidUpdate() {
+    const pixels = this.props.canvas.pixels;
+    this.webView.postMessage(`draw:${pixels.toString()}`);
   }
 
   convertLocationToPosition(location) {
@@ -68,7 +89,8 @@ export default class PixelCanvas extends React.Component {
           height,
           shadowRadius: pixelSize * 5,
           shadowColor: 'black',
-          shadowOpacity: 1
+          shadowOpacity: 1,
+          shadowOffset: { width: 0, height: 0 }
         }}
         onStartShouldSetResponder={() => true}
         onMoveShouldSetResponder={() => true}
@@ -85,11 +107,7 @@ export default class PixelCanvas extends React.Component {
           style={{ width, height }}
           source={{ html: this.html }}
           ref={webView => (this.webView = webView)}
-          onLoadStart={
-            () =>
-              socket.on('pixel', ({ color, index }) =>
-                this.webView.postMessage(`${color}:${index}`))
-          }
+          onError={() => console.log('FUCK!')}
         />
       </View>
     );

@@ -53,7 +53,8 @@ export default class JoinCanvasForm extends React.Component {
         onChange={this.handleChange.bind(this)}
         style={{
           width: inputWidth,
-          height: inputHeight
+          height: inputHeight,
+          textAlign: 'center'
         }}
       />
     );
@@ -68,7 +69,8 @@ export default class JoinCanvasForm extends React.Component {
         onChange={this.handleChange.bind(this)}
         style={{
           width: inputWidth,
-          height: inputHeight
+          height: inputHeight,
+          textAlign: 'center'
         }}
       />
     );

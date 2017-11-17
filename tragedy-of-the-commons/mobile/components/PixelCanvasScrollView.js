@@ -25,14 +25,14 @@ export default class PixelCanvasScrollView extends React.Component {
   }
 
   render() {
-    const { socket, canvas, toggleColorSelector } = this.props;
+    const { socket, canvas, style } = this.props;
     return (
       <ScrollView
         ref='scrollView'
         centerContent
         maximumZoomScale={20}
         minimumZoomScale={0.1}
-        style={{ backgroundColor: '#efefef', width: '100%', height: '100%' }}
+        style={[{ backgroundColor: '#efefef', width: '100%', height: '100%' }, style]}
         contentContainerStyle={{
           width: this.width + (pixelSize * 20),
           height: this.height + (pixelSize * 20),
@@ -46,7 +46,6 @@ export default class PixelCanvasScrollView extends React.Component {
           canvas={canvas}
           pixelSize={pixelSize}
           socket={socket}
-          toggleColorSelector={toggleColorSelector}
         />
       </ScrollView>
     );

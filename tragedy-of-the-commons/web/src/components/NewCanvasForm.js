@@ -46,7 +46,8 @@ export default class NewCanvasForm extends React.Component {
       <TextInput type={'password'} label={'Password'} name={'password'}
         style={{
           width: inputWidth,
-          height: inputHeight
+          height: inputHeight,
+          textAlign: 'center'
         }}
       />
     ) : null;
@@ -76,7 +77,8 @@ export default class NewCanvasForm extends React.Component {
           <TextInput label={'Title'} name={'title'}
             style={{
               width: inputWidth,
-              height: inputHeight
+              height: inputHeight,
+              textAlign: 'center'
             }}
           />
           <div style={{ display: 'flex', flexDirection: 'row' }}>

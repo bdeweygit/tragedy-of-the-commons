@@ -7,6 +7,8 @@ import NewCanvasForm from './components/NewCanvasForm';
 import JoinCanvasForm from './components/JoinCanvasForm';
 import BlackButton from './components/BlackButton';
 
+const pixelSize = 2;
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -15,11 +17,26 @@ export default class App extends React.Component {
       canvas: null,
       showLoader: true,
       showNewCanvasForm: false,
-      showJoinCanvasForm: false
+      showJoinCanvasForm: false,
+      pixel: null
     };
 
     this.socket = io();
+
     this.socket.on('canvas', ({ canvas }) => this.setCanvas(canvas));
+
+    this.socket.on('pixel', ({ color, index}) => {
+      if (this.htmlCanvas) {
+        const ctx = this.htmlCanvas.getContext('2d');
+        const cols = this.state.canvas.cols;
+
+        const row = Math.floor(index / cols);
+        const col = index % cols;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+      }
+    });
   }
 
   setCanvas(canvas) {
@@ -104,8 +121,10 @@ export default class App extends React.Component {
         className="PixelCanvas"
         rows={rows}
         cols={cols}
+        pixelSize={pixelSize}
         socket={this.socket}
         canvas={this.state.canvas}
+        onMount={htmlCanvas => this.htmlCanvas = htmlCanvas}
       />
     );
   }

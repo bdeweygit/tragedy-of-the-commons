@@ -75,6 +75,7 @@ const configureOnCreate = socket => {
         if (avail) {
           ackFn(true);
           makeAndSaveCanvas(title, password, doc => {
+            joinRoom(socket, doc._id);
             socket.emit('canvas', { canvas: doc });
           });
         } else {
