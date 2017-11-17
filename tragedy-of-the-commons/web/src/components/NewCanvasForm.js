@@ -43,7 +43,10 @@ export default class NewCanvasForm extends React.Component {
   renderPasswordInputOrNull() {
     const { inputWidth, inputHeight } = this.props;
     return this.state.showPasswordInput ? (
-      <TextInput type={'password'} label={'Password'} name={'password'}
+      <TextInput
+        type={'password'}
+        placeholder={'Password'}
+        name={'password'}
         style={{
           width: inputWidth,
           height: inputHeight,
@@ -53,9 +56,38 @@ export default class NewCanvasForm extends React.Component {
     ) : null;
   }
 
+  renderRadios() {
+    const showPasswordInput = this.state.showPasswordInput;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <label>Public</label>
+        <input
+          checked={!showPasswordInput}
+          type="radio" name="access"
+          value="public"
+          onClick={this.onClickPublicRadio.bind(this)}
+        />
+        <label>Private</label>
+        <input
+          checked={showPasswordInput}
+          type="radio"
+          name="access"
+          value="private"
+          onClick={this.onClickPrivateRadio.bind(this)}
+        />
+      </div>
+    );
+  }
+
   render() {
     const { className, inputWidth, inputHeight, onClose } = this.props;
-    const showPasswordInput = this.state.showPasswordInput;
     const backgroundColor = this.state.formColor;
     return (
       <div style={{
@@ -70,34 +102,25 @@ export default class NewCanvasForm extends React.Component {
           ref={ref => this.form = ref}
           method={'post'}
           className={className}
-          style={{ backgroundColor }}
+          style={{
+            backgroundColor,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
           onSubmit={e => e.preventDefault()}
         >
-          <BlackButton onClick={onClose} text={'Close'} />
-          <TextInput label={'Title'} name={'title'}
+          <div style={{ display: 'flex', width: '100%'}}>
+            <BlackButton onClick={onClose} text={'x'} />
+          </div>
+          <TextInput name={'title'} placeholder={'Title'}
             style={{
               width: inputWidth,
               height: inputHeight,
               textAlign: 'center'
             }}
           />
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <label>Public</label>
-            <input
-              checked={!showPasswordInput}
-              type="radio" name="access"
-              value="public"
-              onClick={this.onClickPublicRadio.bind(this)}
-            />
-            <label>Private</label>
-            <input
-              checked={showPasswordInput}
-              type="radio"
-              name="access"
-              value="private"
-              onClick={this.onClickPrivateRadio.bind(this)}
-            />
-          </div>
+          {this.renderRadios()}
           {this.renderPasswordInputOrNull()}
           <BlackButton onClick={this.onClickButton.bind(this)} text={'Create'} width={200} height={40} />
         </form>

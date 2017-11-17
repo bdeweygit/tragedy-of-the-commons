@@ -2,17 +2,32 @@ import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { KeepAwake } from 'expo';
 import io from 'socket.io-client';
+import globe from './globe.png';
+import search from './search.png';
 import PixelCanvasScrollView from './components/PixelCanvasScrollView';
-import BlackButton from './components/BlackButton';
+import ImageButton from './components/ImageButton';
+import ColorButton from './components/ColorButton';
 import Title from './components/Title';
 import JoinForm from './components/JoinForm';
+
+const colors = [
+  'black',
+  'white',
+  'red',
+  'green',
+  'blue',
+  'yellow',
+  'purple',
+  'orange',
+  '#8B4513' // saddlebrown
+];
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { canvas: {}, showJoinForm: false };
+    this.state = { canvas: {}, showJoinForm: false, color: 'black' };
 
-    this.socket = io('http://localhost:3000');
+    this.socket = io('http://linserv2.cims.nyu.edu:11601');
     this.socket.on('canvas', ({ canvas }) => {
       this.setState(prevState => ({ ...prevState, canvas }));
     });
@@ -26,13 +41,17 @@ export default class App extends React.Component {
     }));
   }
 
-  joinDefaultCanvas() {
-    const query = { title: 'TRAGEDY OF THE COMMONS' };
-    this.socket.emit('join', query, ({ canvas }) => this.setCanvas(canvas));
+  setSelectedColor(color) {
+    this.setState(ps => ({ ...ps, color }));
   }
 
   toggleJoinForm() {
     this.setState(ps => ({ ...ps, showJoinForm: !ps.showJoinForm }));
+  }
+
+  joinDefaultCanvas() {
+    const query = { title: 'TRAGEDY OF THE COMMONS' };
+    this.socket.emit('join', query, ({ canvas }) => this.setCanvas(canvas));
   }
 
   renderLoader() {
@@ -45,11 +64,23 @@ export default class App extends React.Component {
   }
 
   renderColorButtons() {
-    const buttons = [];
-    for (let i = 0; i < 10; i++) {
-      buttons.push(<BlackButton key={i} style={{ flex: 1, marginTop: 2 }} />);
-    }
-    return buttons;
+    return colors.reduce((arr, color, index) => [
+      ...arr,
+      <ColorButton
+        key={index}
+        style={{
+            flex: 1,
+            marginTop: 2,
+            backgroundColor: color,
+            shadowRadius: 1,
+            shadowColor: 'black',
+            shadowOpacity: 1,
+            shadowOffset: { width: 0, height: 0 }
+        }}
+        selectedColor={this.state.color}
+        onPress={this.setSelectedColor.bind(this, color)}
+      />
+    ], []);
   }
 
   renderJoinFormOrNull() {
@@ -65,6 +96,7 @@ export default class App extends React.Component {
           width: 50,
           paddingBottom: 2,
           paddingRight: 2,
+          paddingLeft: 2,
           height: '100%',
           justifyContent: 'center',
           alignItems: 'stretch',
@@ -80,13 +112,15 @@ export default class App extends React.Component {
     const text = this.state.canvas.title;
     return (
       <View style={{ flexDirection: 'row', height: 30, margin: 10 }}>
-        <BlackButton
+        <ImageButton
           style={{ width: 30, height: 30, marginRight: 10 }}
           onPress={this.joinDefaultCanvas.bind(this)}
+          source={globe}
         />
-        <BlackButton
+        <ImageButton
           style={{ width: 30, height: 30, marginRight: 10 }}
           onPress={this.toggleJoinForm.bind(this)}
+          source={search}
         />
         <Title text={text} style={{ height: 30 }} />
       </View>
@@ -94,12 +128,13 @@ export default class App extends React.Component {
   }
 
   renderTragedy() {
-    const canvas = this.state.canvas;
+    const { canvas, color } = this.state;
     return (
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
         <PixelCanvasScrollView
           style={{ position: 'absolute' }}
           canvas={canvas}
+          color={color}
           socket={this.socket}
         />
         {this.renderTopBar()}

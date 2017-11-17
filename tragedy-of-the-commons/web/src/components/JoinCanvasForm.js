@@ -46,7 +46,7 @@ export default class JoinCanvasForm extends React.Component {
   renderPasswordInput(inputWidth, inputHeight) {
     return (
       <TextInput
-        label={'Password'}
+        placeholder={'Password'}
         name={'password'}
         type={'password'}
         value={this.state.value}
@@ -63,7 +63,7 @@ export default class JoinCanvasForm extends React.Component {
   renderTitleInput(inputWidth, inputHeight) {
     return (
       <TextInput
-        label={'Title'}
+        placeholder={'Title'}
         name={'title'}
         value={this.state.value}
         onChange={this.handleChange.bind(this)}
@@ -97,10 +97,17 @@ export default class JoinCanvasForm extends React.Component {
         <form
           ref={ref => this.form = ref}
           className={className}
-          style={{ backgroundColor }}
+          style={{
+            backgroundColor,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
           onSubmit={e => e.preventDefault()}
         >
-          <BlackButton onClick={onClose} text={'Close'} />
+          <div style={{ display: 'flex', width: '100%'}}>
+            <BlackButton onClick={onClose} text={'x'} />
+          </div>
           {this.renderInput(inputWidth, inputHeight)}
           <BlackButton onClick={this.onClickButton.bind(this)} text={buttonText} width={200} height={40} />
         </form>

@@ -57,6 +57,7 @@ export default class JoinForm extends React.Component {
         }}
         onChangeText={title => this.setState(ps => ({ ...ps, title }))}
         value={this.state.title}
+        placeholder={'Title'}
       />
     );
   }
@@ -76,6 +77,7 @@ export default class JoinForm extends React.Component {
         onChangeText={password => this.setState(ps => ({ ...ps, password }))}
         value={this.state.password}
         secureTextEntry
+        placeholder={'Password'}
       />
     );
   }

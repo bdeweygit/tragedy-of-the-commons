@@ -25,7 +25,7 @@ export default class PixelCanvasScrollView extends React.Component {
   }
 
   render() {
-    const { socket, canvas, style } = this.props;
+    const { socket, canvas, color, style } = this.props;
     return (
       <ScrollView
         ref='scrollView'
@@ -44,6 +44,7 @@ export default class PixelCanvasScrollView extends React.Component {
           width={this.width}
           height={this.height}
           canvas={canvas}
+          color={color}
           pixelSize={pixelSize}
           socket={socket}
         />

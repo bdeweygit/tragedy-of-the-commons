@@ -8,6 +8,7 @@ export default class BlackButton extends React.Component {
       <div>
         <button onClick={onClick} type={'button'} style={{
             color: 'white',
+            textAlign: 'center',
             backgroundColor: 'black',
             width,
             height

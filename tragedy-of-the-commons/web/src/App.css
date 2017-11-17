@@ -54,6 +54,16 @@
   animation: Loader-spin 2s linear infinite;
 }
 
+form > input {
+    font-size: 25px;
+    background-color: #e6e6e6;
+    border: 2px solid black;
+}
+
+button {
+    font-size:16px;
+}
+
 @keyframes Loader-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

@@ -8,12 +8,12 @@ export default class BlackButton extends React.Component {
     return (
       <TouchableOpacity
         style={[
-            style,
             {
               backgroundColor: 'black',
               justifyContent: 'center',
               alignItems: 'center'
-            }
+            },
+            style
         ]}
         onPress={onPress}
       >

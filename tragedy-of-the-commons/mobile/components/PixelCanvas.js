@@ -64,7 +64,8 @@ export default class PixelCanvas extends React.Component {
     });
   }
 
-  shouldComponentUpdate({ canvas }) {
+  shouldComponentUpdate({ canvas, color }) {
+    this.color = color;
     return canvas._id !== this.props.canvas._id;
   }
 
@@ -99,7 +100,7 @@ export default class PixelCanvas extends React.Component {
           const col = this.convertLocationToPosition(locationX);
           const row = this.convertLocationToPosition(locationY);
           const index = col + (row * canvas.cols);
-          socket.emit('pixel', { index, color: 'black', _id, hash });
+          socket.emit('pixel', { index, color: this.color, _id, hash });
         }}
       >
         <WebView

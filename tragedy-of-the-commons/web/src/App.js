@@ -1,6 +1,6 @@
 import React from 'react';
 import io from 'socket.io-client';
-import hardin from './hardin.png';
+import globe from './globe.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import NewCanvasForm from './components/NewCanvasForm';
@@ -184,7 +184,7 @@ export default class App extends React.Component {
         {this.renderQR()}
         <div style={{ flex: 1 }}>
           <input type="image"
-            src={hardin}
+            src={globe}
             className="App-logo"
             alt={'logo'}
             onClick={this.joinDefaultCanvas.bind(this)}
