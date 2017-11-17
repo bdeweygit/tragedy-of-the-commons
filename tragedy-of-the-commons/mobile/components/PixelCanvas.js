@@ -56,12 +56,17 @@ export default class PixelCanvas extends React.Component {
   }
 
   componentDidMount() {
-    const pixels = this.props.canvas.pixels;
-    this.webView.postMessage(`draw:${pixels.toString()}`);
-
-    this.props.socket.on('pixel', ({ color, index }) => {
-      this.webView.postMessage(`pixel:${color},${index}`);
-    });
+    // Delay the first postMessage because webview needs to load.
+    // Ideally the postMessage would be done in WebView.onLoad but the 
+    // callback does not fire as consequence of setting WebView source html.
+    // This is a ReactNative bug.
+    setTimeout(() => {
+      const pixels = this.props.canvas.pixels;
+      this.webView.postMessage(`draw:${pixels.toString()}`);
+      this.props.socket.on('pixel', ({ color, index }) => {
+        this.webView.postMessage(`pixel:${color},${index}`);
+      });
+    }, 1000);
   }
 
   shouldComponentUpdate({ canvas, color }) {
@@ -108,7 +113,6 @@ export default class PixelCanvas extends React.Component {
           style={{ width, height }}
           source={{ html: this.html }}
           ref={webView => (this.webView = webView)}
-          onError={() => console.log('FUCK!')}
         />
       </View>
     );
