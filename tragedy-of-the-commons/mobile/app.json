@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Tragedy Of The Commons",
-    "description": "An empty new project",
+    "description": "Mobile app to accompany the Tragedy Of The Commons web app; part of a final project for AIT",
     "slug": "tragedy-of-the-commons-expo-app",
     "privacy": "public",
     "sdkVersion": "22.0.0",

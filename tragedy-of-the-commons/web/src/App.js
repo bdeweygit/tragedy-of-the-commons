@@ -1,6 +1,9 @@
 import React from 'react';
 import io from 'socket.io-client';
 import globe from './globe.png';
+import qr from './qr.png';
+import apple from './apple.png';
+import google from './google.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import NewCanvasForm from './components/NewCanvasForm';
@@ -169,8 +172,19 @@ export default class App extends React.Component {
   renderQR() {
     return (
       this.state.showLoader ? null : (
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-          <div style={{ backgroundColor: 'black', height: 100, width: 100 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <img src={qr} alt={'QRCode'} style={{height: 100, width: 100 }} />
+          <p style={{ width: 120 }}>
+            {'Download Expo and scan this QR code to participate'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
+            <a href={'https://itunes.apple.com/app/apple-store/id982107779?ct=www&mt=8'}>
+              <img src={apple} alt={'apple app store'} style={{ height: 40, width: 160 }} />
+            </a>
+            <a href={'https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=www'}>
+              <img src={google} alt={'google play store'} style={{ height: 40, width: 160 }} />
+            </a>
+          </div>
         </div>
       )
     );

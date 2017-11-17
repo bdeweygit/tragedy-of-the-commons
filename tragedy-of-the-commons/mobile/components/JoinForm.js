@@ -107,7 +107,7 @@ export default class JoinForm extends React.Component {
           width: 400,
           height: 100,
           left: (Dimensions.get('window').width / 2) - 200,
-          top: (Dimensions.get('window').height / 2) - 50,
+          top: (Dimensions.get('window').height / 6),
           backgroundColor: this.state.formColor,
           flexDirection: 'column',
           justifyContent: 'space-around',
