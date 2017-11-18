@@ -4,10 +4,12 @@ import { KeepAwake } from 'expo';
 import io from 'socket.io-client';
 import globe from './globe.png';
 import search from './search.png';
+import info from './info.png';
 import PixelCanvasScrollView from './components/PixelCanvasScrollView';
 import ImageButton from './components/ImageButton';
 import ColorButton from './components/ColorButton';
 import Title from './components/Title';
+import Info from './components/Info';
 import JoinForm from './components/JoinForm';
 
 const colors = [
@@ -25,7 +27,7 @@ const colors = [
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { canvas: {}, showJoinForm: false, color: 'black' };
+    this.state = { canvas: {}, showJoinForm: false, showInfo: false, color: 'black' };
 
     this.socket = io('http://linserv2.cims.nyu.edu:11601');
     this.socket.on('canvas', ({ canvas }) => {
@@ -46,7 +48,11 @@ export default class App extends React.Component {
   }
 
   toggleJoinForm() {
-    this.setState(ps => ({ ...ps, showJoinForm: !ps.showJoinForm }));
+    this.setState(ps => ({ ...ps, showInfo: false, showJoinForm: !ps.showJoinForm }));
+  }
+
+  toggleInfo() {
+    this.setState(ps => ({ ...ps, showJoinForm: false, showInfo: !ps.showInfo }));
   }
 
   joinDefaultCanvas() {
@@ -89,6 +95,12 @@ export default class App extends React.Component {
     ) : null;
   }
 
+  renderInfoOrNull() {
+    return this.state.showInfo ? (
+      <Info />
+    ) : null;
+  }
+
   renderControlBar() {
     return (
       <View
@@ -122,6 +134,11 @@ export default class App extends React.Component {
           onPress={this.toggleJoinForm.bind(this)}
           source={search}
         />
+        <ImageButton
+          style={{ width: 30, height: 30, marginRight: 10 }}
+          onPress={this.toggleInfo.bind(this)}
+          source={info}
+        />
         <Title text={text} style={{ height: 30 }} />
       </View>
     );
@@ -141,6 +158,7 @@ export default class App extends React.Component {
         {this.renderTopBar()}
         {this.renderControlBar()}
         {this.renderJoinFormOrNull()}
+        {this.renderInfoOrNull()}
         <KeepAwake />
       </View>
     );
