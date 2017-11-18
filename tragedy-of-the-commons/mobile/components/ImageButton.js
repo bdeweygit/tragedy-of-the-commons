@@ -7,7 +7,11 @@ export default class ImageButton extends React.Component {
     const { source, onPress, style } = this.props;
     return (
       <TouchableOpacity style={style} onPress={onPress}>
-        <Image source={source} />
+        <Image
+          resizeMode={'contain'} 
+          style={{ width: style.width, height: style.height }}
+          source={source}
+        />
       </TouchableOpacity>
     );
   }
