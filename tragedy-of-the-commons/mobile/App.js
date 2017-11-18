@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StatusBar } from 'react-native';
 import { KeepAwake } from 'expo';
 import io from 'socket.io-client';
 import globe from './globe.png';
@@ -131,6 +131,7 @@ export default class App extends React.Component {
     const { canvas, color } = this.state;
     return (
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+        <StatusBar hidden />
         <PixelCanvasScrollView
           style={{ position: 'absolute' }}
           canvas={canvas}
