@@ -174,8 +174,8 @@ export default class App extends React.Component {
       this.state.showLoader ? null : (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <img src={qr} alt={'QRCode'} style={{height: 100, width: 100 }} />
-          <p style={{ width: 120 }}>
-            {'Download Expo and scan this QR code to participate'}
+          <p style={{ width: 120, marginLeft: 10, marginRight: 10 }}>
+            {'Download Expo and scan this QR code to start drawing'}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
             <a href={'https://itunes.apple.com/app/apple-store/id982107779?ct=www&mt=8'}>
