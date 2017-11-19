@@ -12,22 +12,29 @@ import Title from './components/Title';
 import Info from './components/Info';
 import JoinForm from './components/JoinForm';
 
-const colors = [
-  'black',
-  'white',
-  'red',
-  'green',
-  'blue',
-  'yellow',
-  'purple',
-  'orange',
-  '#8B4513' // saddlebrown
+const pixelColors = [
+  '#222222',
+  '#ffffff',
+  '#e4e4e4',
+  '#888888',
+  '#ffa7d1',
+  '#e50000',
+  '#e59500',
+  '#a06a42',
+  '#e5d900',
+  '#94e044',
+  '#02be01',
+  '#00d3dd',
+  '#0083c7',
+  '#0000ea',
+  '#cf6ee4',
+  '#820080'
 ];
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { canvas: {}, showJoinForm: false, showInfo: false, color: 'black' };
+    this.state = { canvas: {}, showJoinForm: false, showInfo: false, color: '#222222' };
 
     this.socket = io('http://linserv2.cims.nyu.edu:11601');
     this.socket.on('canvas', ({ canvas }) => {
@@ -69,7 +76,7 @@ export default class App extends React.Component {
     );
   }
 
-  renderColorButtons() {
+  renderColorButtons(colors) {
     return colors.reduce((arr, color, index) => [
       ...arr,
       <ColorButton
@@ -101,7 +108,7 @@ export default class App extends React.Component {
     ) : null;
   }
 
-  renderControlBar() {
+  renderColorBar(colors) {
     return (
       <View
         style={{
@@ -115,7 +122,7 @@ export default class App extends React.Component {
           flexDirection: 'column'
         }}
       >
-        {this.renderColorButtons()}
+        {this.renderColorButtons(colors)}
       </View>
     );
   }
@@ -156,7 +163,10 @@ export default class App extends React.Component {
           socket={this.socket}
         />
         {this.renderTopBar()}
-        {this.renderControlBar()}
+        <View style={{ flexDirection: 'row' }}>
+          {this.renderColorBar(pixelColors.slice(0, 8))}
+          {this.renderColorBar(pixelColors.slice(8, 16))}
+        </View>
         {this.renderJoinFormOrNull()}
         {this.renderInfoOrNull()}
         <KeepAwake />

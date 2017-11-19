@@ -11,7 +11,12 @@ export default class ColorButton extends React.Component {
         onPress={onPress}
       >
         <View
-          style={[style, { opacity: style.backgroundColor === selectedColor ? 1 : 0.2 }]}
+          style={[style,
+            {
+              opacity: style.backgroundColor === selectedColor ? 1 : 0.2,
+              shadowRadius: 4 
+            }
+          ]}
         />
       </TouchableWithoutFeedback>
     );
