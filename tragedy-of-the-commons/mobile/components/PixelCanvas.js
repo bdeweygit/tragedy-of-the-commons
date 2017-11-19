@@ -9,6 +9,8 @@ export default class PixelCanvas extends React.Component {
     const { rows, cols } = props.canvas;
     const pixelSize = props.pixelSize;
 
+    this.color = props.color;
+
     this.html = `
       <!DOCTYPE html>
       <meta
@@ -57,7 +59,7 @@ export default class PixelCanvas extends React.Component {
 
   componentDidMount() {
     // Delay the first postMessage because webview needs to load.
-    // Ideally the postMessage would be done in WebView.onLoad but the 
+    // Ideally the postMessage would be done in WebView.onLoad but the
     // callback does not fire as consequence of setting WebView source html.
     // This is a ReactNative bug.
     setTimeout(() => {
