@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, Platform } from 'react-native';
 import PixelCanvas from './PixelCanvas';
 
 const pixelSize = 6;
@@ -12,16 +12,18 @@ export default class PixelCanvasScrollView extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      const options = {
-        x: 0,
-        y: 0,
-        width: this.width + (pixelSize * 150),
-        height: this.height + (pixelSize * 150),
-        animated: false
-      };
-      this.refs.scrollView.scrollResponderZoomTo(options);
-    }, 8);
+    if (Platform.OS === 'ios') {
+      setTimeout(() => {
+        const options = {
+          x: 0,
+          y: 0,
+          width: this.width + (pixelSize * 150),
+          height: this.height + (pixelSize * 150),
+          animated: false
+        };
+        this.refs.scrollView.scrollResponderZoomTo(options);
+      }, 8);
+    }
   }
 
   render() {

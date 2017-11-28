@@ -1,4 +1,5 @@
 import React from 'react';
+
 export default class PixelCanvas extends React.Component {
   drawCanvas() {
     const pixelSize = this.props.pixelSize;
