@@ -193,7 +193,7 @@ export default class App extends React.Component {
         {"Sadly, this experience does not work well on Android. If you don't have an iOS device you can still view the experience in an Appetize.io virtual iOS device. To try it out please visit the link below in your desktop web browser and select the iOS preview at the bottom."}
       </Text>
       <Text>
-        {'\nhttps://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons-expo-snack'}
+        {'\nhttps://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons'}
       </Text>
     </View>
     );

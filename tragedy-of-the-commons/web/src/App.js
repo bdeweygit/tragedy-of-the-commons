@@ -181,7 +181,7 @@ export default class App extends React.Component {
             <a href={'https://itunes.apple.com/app/apple-store/id982107779?ct=www&mt=8'}>
               <img src={apple} alt={'apple app store'} style={{ height: 40, width: 160 }} />
             </a>
-            <a href={'https://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons-expo-snack'}>
+            <a href={'https://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons'}>
               <img src={snack} alt={'expo snack'} style={{ height: 40, width: 160 }} />
             </a>
           </div>
