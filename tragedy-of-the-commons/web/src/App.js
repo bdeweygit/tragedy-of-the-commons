@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import globe from './globe.png';
 import qr from './qr.png';
 import apple from './apple.png';
-import google from './google.png';
+import snack from './snack.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import NewCanvasForm from './components/NewCanvasForm';
@@ -181,8 +181,8 @@ export default class App extends React.Component {
             <a href={'https://itunes.apple.com/app/apple-store/id982107779?ct=www&mt=8'}>
               <img src={apple} alt={'apple app store'} style={{ height: 40, width: 160 }} />
             </a>
-            <a href={'https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=www'}>
-              <img src={google} alt={'google play store'} style={{ height: 40, width: 160 }} />
+            <a href={'https://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons-expo-snack'}>
+              <img src={snack} alt={'expo snack'} style={{ height: 40, width: 160 }} />
             </a>
           </div>
         </div>
