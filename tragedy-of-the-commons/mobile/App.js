@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, ActivityIndicator, StatusBar } from 'react-native';
+import { View, Text, ActivityIndicator, StatusBar, Platform } from 'react-native';
 import { KeepAwake } from 'expo';
 import io from 'socket.io-client';
-import globe from './globe.png';
-import search from './search.png';
-import info from './info.png';
+import globe from './assets/globe.png';
+import search from './assets/search.png';
+import info from './assets/info.png';
 import PixelCanvasScrollView from './components/PixelCanvasScrollView';
 import ImageButton from './components/ImageButton';
 import ColorButton from './components/ColorButton';
@@ -151,17 +151,24 @@ export default class App extends React.Component {
     );
   }
 
-  renderTragedy() {
+  renderPixelCanvasScrollView() {
     const { canvas, color } = this.state;
+
+    return (
+      <PixelCanvasScrollView
+        style={{ position: 'absolute' }}
+        canvas={canvas}
+        color={color}
+        socket={this.socket}
+      />
+    );
+  }
+
+  renderTragedy() {
     return (
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
         <StatusBar hidden />
-        <PixelCanvasScrollView
-          style={{ position: 'absolute' }}
-          canvas={canvas}
-          color={color}
-          socket={this.socket}
-        />
+        {this.renderPixelCanvasScrollView()}
         {this.renderTopBar()}
         <View style={{ flexDirection: 'row' }}>
           {this.renderColorBar(pixelColors.slice(0, 8))}
@@ -174,8 +181,25 @@ export default class App extends React.Component {
     );
   }
 
-  render() {
+  renderIos() {
     return Object.keys(this.state.canvas).length > 0 ?
       this.renderTragedy() : this.renderLoader();
+  }
+
+  renderAndroid() {
+    return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <Text>
+        {"Sadly, this experience does not work well on Android. If you don't have an iOS device you can still view the experience in an Appetize.io virtual iOS device. To try it out please visit the link below in your desktop web browser and select the iOS preview at the bottom."}
+      </Text>
+      <Text>
+        {'\nhttps://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons-expo-snack'}
+      </Text>
+    </View>
+    );
+  }
+
+  render() {
+    return Platform.OS === 'ios' ? this.renderIos() : this.renderAndroid();
   }
 }

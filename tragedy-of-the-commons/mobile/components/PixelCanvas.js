@@ -22,11 +22,11 @@ export default class PixelCanvas extends React.Component {
       />
 
       <html>
-        <body style="margin: 0">
+        <body style="margin: 0;">
           <canvas id="myCanvas"
             width="${cols * pixelSize}"
             height="${rows * pixelSize}"
-            style="background-color: white; width: 100%; height: 100%"
+            style="display: block; background-color: white; width: 100%; height: 100%"
           />
 
           <script>
