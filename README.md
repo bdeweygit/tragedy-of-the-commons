@@ -48,7 +48,7 @@ An Example Public Canvas:
 ```
 
 
-## [Link to Commented First Draft Schema](/tragedy-of-the-commons/server/db.js)
+## [Link to Commented First Draft Schema](/server/db.js)
 
 ## Wireframes
 
@@ -91,7 +91,7 @@ Since this is a single page application the site map can be modeled as a single 
 
 8 points total out of 8 required points
 
-## [Link to Initial Main Project File](/tragedy-of-the-commons/server/index.js)
+## [Link to Initial Main Project File](/server/index.js)
 
 ## Annotations / References Used
 
