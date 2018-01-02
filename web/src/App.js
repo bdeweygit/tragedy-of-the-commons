@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 import globe from './globe.png';
 import qr from './qr.png';
 import apple from './apple.png';
-import snack from './snack.png';
 import './App.css';
 import PixelCanvas from './components/PixelCanvas';
 import NewCanvasForm from './components/NewCanvasForm';
@@ -177,12 +176,9 @@ export default class App extends React.Component {
           <p style={{ width: 120, marginLeft: 10, marginRight: 10 }}>
             {'Download Expo and scan this QR code to start drawing'}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <a href={'https://itunes.apple.com/app/apple-store/id982107779?ct=www&mt=8'}>
               <img src={apple} alt={'apple app store'} style={{ height: 40, width: 160 }} />
-            </a>
-            <a href={'https://snack.expo.io/@benjamin-dewey/tragedy-of-the-commons-snack'}>
-              <img src={snack} alt={'expo snack'} style={{ height: 40, width: 160 }} />
             </a>
           </div>
         </div>
