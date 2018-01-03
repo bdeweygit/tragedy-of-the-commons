@@ -36,7 +36,7 @@ export default class App extends React.Component {
     super(props);
     this.state = { canvas: {}, showJoinForm: false, showInfo: false, color: '#222222' };
 
-    this.socket = io('http://linserv2.cims.nyu.edu:11601');
+    this.socket = io('https://tragedy-of-the-commons.herokuapp.com/');
     this.socket.on('canvas', ({ canvas }) => {
       this.setState(prevState => ({ ...prevState, canvas }));
     });

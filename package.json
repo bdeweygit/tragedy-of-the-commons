@@ -1,0 +1,11 @@
+{
+  "name": "tragedy-of-the-commons",
+  "version": "1.0.0",
+  "main": "server/index.js",
+  "repository": "https://github.com/Benjamin-Dewey/tragedy-of-the-commons.git",
+  "author": "Benjamin Dewey <benjamin.m.dewey@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "heroku-prebuild": "cd web && yarn && yarn build && cd ../server && yarn && cd .."
+  }
+}
