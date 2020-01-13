@@ -54,7 +54,7 @@ An Example Public Canvas:
 
 The web app is a single page application for viewing and creating canvases.
 
-![web](documentation/web.png)
+![web](./documentation/web.png)
 
 ![web-create-canvas](documentation/web-create-canvas.png)
 
